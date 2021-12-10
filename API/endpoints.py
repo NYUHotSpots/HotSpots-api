@@ -36,7 +36,7 @@ class HelloWorld(Resource):
 
 
 @api.route('/flavors')
-class GetFlavors(Resource):
+class Flavor(Resource):
     """
     This endpoint returns a list of all flavors
     """
@@ -52,33 +52,6 @@ class GetFlavors(Resource):
         else:
             return flavors
 
-
-@api.route('/flavors/<flavor_id>')
-class GetFlavorDetail(Resource):
-    """
-    This endpoint returns a details of a flavor
-    """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    def get(self, flavor_id):
-        """
-        Returns a details of a flavor
-        """
-        flavor_detail = db.get_flavor_detail(flavor_id)
-        if flavor_detail == db.NOT_FOUND:
-            raise (wz.NotFound("Flavor detail not found."))
-        else:
-            return flavor_detail
-
-    def delete(self, flavor_id):
-        pass
-
-
-@api.route('/flavors/create')
-class CreateFlavor(Resource):
-    """
-    This endpoint creates a new flavor
-    """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -96,15 +69,32 @@ class CreateFlavor(Resource):
         else:
             return f"{flavor_response} added."
 
-@api.route('/flavors/update/<flavor_id>')
-class UpdateFlavor(Resource):
+
+@api.route('/flavors/<flavor_id>')
+class FlavorDetail(Resource):
+    """
+    This endpoint returns a details of a flavor
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    def get(self, flavor_id):
+        """
+        Returns a details of a flavor
+        """
+        flavor_detail = db.get_flavor_detail(flavor_id)
+        if flavor_detail == db.NOT_FOUND:
+            raise (wz.NotFound("Flavor detail not found."))
+        else:
+            return flavor_detail
+
+
     """
     This endpoint updates a flavor
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=flavorParser)
-    def post(self, flavor_id):
+    def put(self, flavor_id):
         """
         Update a flavor
         """
@@ -115,19 +105,78 @@ class UpdateFlavor(Resource):
         else:
             return f"{flavor_response} added."
 
-@api.route('/flavors/delete/<flavor_id>')
-class UpdateFlavor(Resource):
+
     """
     This endpoint deletes a new flavor
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    def get(self, flavor_id):
+    def delete(self, flavor_id):
         """
-        Update a flavor
+        Delete a flavor
         """
         flavor_response = db.delete_flavor(flavor_id)
         if flavor_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
             return f"{flavor_response} deleted."
+
+
+# @api.route('/flavors/create')
+# class CreateFlavor(Resource):
+#     """
+#     This endpoint creates a new flavor
+#     """
+#     @api.response(HTTPStatus.OK, 'Success')
+#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+#     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+#     @api.doc(parser=flavorParser)
+#     def post(self):
+#         """
+#         Creates a new flavor
+#         """
+#         args = flavorParser.parse_args()
+#         flavor_response = db.add_flavor(args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
+#         if flavor_response == db.NOT_FOUND:
+#             raise (wz.NotFound("Flavor not found."))
+#         elif flavor_response == db.DUPLICATE:
+#             raise (wz.NotAcceptable("Flavor already exists."))
+#         else:
+#             return f"{flavor_response} added."
+
+
+# @api.route('/flavors/update/<flavor_id>')
+# class UpdateFlavor(Resource):
+#     """
+#     This endpoint updates a flavor
+#     """
+#     @api.response(HTTPStatus.OK, 'Success')
+#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+#     @api.doc(parser=flavorParser)
+#     def post(self, flavor_id):
+#         """
+#         Update a flavor
+#         """
+#         args = flavorParser.parse_args()
+#         flavor_response = db.update_flavor(flavor_id, args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
+#         if flavor_response == db.NOT_FOUND:
+#             raise (wz.NotFound("Flavor not found."))
+#         else:
+#             return f"{flavor_response} added."
+
+# @api.route('/flavors/delete/<flavor_id>')
+# class DeleteFlavor(Resource):
+#     """
+#     This endpoint deletes a new flavor
+#     """
+#     @api.response(HTTPStatus.OK, 'Success')
+#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+#     def get(self, flavor_id):
+#         """
+#         Delete a flavor
+#         """
+#         flavor_response = db.delete_flavor(flavor_id)
+#         if flavor_response == db.NOT_FOUND:
+#             raise (wz.NotFound("Flavor not found."))
+#         else:
+#             return f"{flavor_response} deleted."

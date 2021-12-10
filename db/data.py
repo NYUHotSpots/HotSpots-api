@@ -92,4 +92,7 @@ def delete_flavor(flavor_id):
     """
     Deletes a flavor
     """
-    dbc.delete_flavor()
+    response = dbc.delete_flavor(flavor_id)
+    if response == None:
+        return NOT_FOUND
+    return response
