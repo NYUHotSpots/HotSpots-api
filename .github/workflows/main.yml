@@ -47,3 +47,10 @@ jobs:
           echo $TEST_MODE
 
           make all_tests
+
+      - name: Deploy to Heroku
+        uses: akhileshns/heroku-deploy@v3.12.12
+        with:
+          heroku_api_key: ${{secrets.HEROKU_API_KEY}}
+          heroku_app_name: profcallahansicecreamemporium
+          heroku_email: kc3585@nyu.edu
