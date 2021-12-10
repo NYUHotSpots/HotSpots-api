@@ -9,7 +9,6 @@ import bson.json_util as bsutil
 username = "prof"
 cloud_db_url = "cluster0.xjsf0.mongodb.net"
 passwd = os.environ.get("MONGO_PASSWD", '')
-print("Password", passwd)
 cloud_mdb = "mongodb+srv"
 db_params = "retryWrites=true&w=majority"
 
