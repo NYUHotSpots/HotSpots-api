@@ -12,13 +12,13 @@ import db.data as db
 
 app = Flask(__name__)
 api = Api(app)
-parser = reqparse.RequestParser()
-parser.add_argument('flavorName', type=str, location='form')
-parser.add_argument('flavorImage', type=str, location='form')
-parser.add_argument('flavorDescription', type=str, location='form')
-parser.add_argument('flavorNutrition', type=str, location='form')
-parser.add_argument('flavorPrice', type=int, location='form')
-parser.add_argument('flavorAvailability', type=bool, location='form')
+flavorParser = reqparse.RequestParser()
+flavorParser.add_argument('flavorName', type=str, location='form')
+flavorParser.add_argument('flavorImage', type=str, location='form')
+flavorParser.add_argument('flavorDescription', type=str, location='form')
+flavorParser.add_argument('flavorNutrition', type=str, location='form')
+flavorParser.add_argument('flavorPrice', type=int, location='form')
+flavorParser.add_argument('flavorAvailability', type=bool, location='form')
 
 
 @api.route('/hello')
@@ -48,9 +48,30 @@ class GetFlavors(Resource):
         """
         flavors = db.get_flavors()
         if flavors is None:
-            raise (wz.NotFound("Chat room db not found."))
+            raise (wz.NotFound("Flavors not found."))
         else:
             return flavors
+
+
+@api.route('/flavors/<flavor_id>')
+class GetFlavorDetail(Resource):
+    """
+    This endpoint returns a details of a flavor
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    def get(self, flavor_id):
+        """
+        Returns a details of a flavor
+        """
+        flavor_detail = db.get_flavor_detail(flavor_id)
+        if flavor_detail == db.NOT_FOUND:
+            raise (wz.NotFound("Flavor detail not found."))
+        else:
+            return flavor_detail
+
+    def delete(self, flavor_id):
+        pass
 
 
 @api.route('/flavors/create')
@@ -61,12 +82,12 @@ class CreateFlavor(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.doc(parser=parser)
+    @api.doc(parser=flavorParser)
     def post(self):
         """
-        Returns a list of all flavors
+        Creates a new flavor
         """
-        args = parser.parse_args()
+        args = flavorParser.parse_args()
         flavor_response = db.add_flavor(args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
         if flavor_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
@@ -75,100 +96,38 @@ class CreateFlavor(Resource):
         else:
             return f"{flavor_response} added."
 
-@api.route('/rooms/create/<roomname>')
-class CreateRoom(Resource):
+@api.route('/flavors/update/<flavor_id>')
+class UpdateFlavor(Resource):
     """
-    This class supports adding a chat room.
+    This endpoint updates a flavor
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, roomname):
+    @api.doc(parser=flavorParser)
+    def post(self, flavor_id):
         """
-        This method adds a room to the room db.
+        Update a flavor
         """
-        ret = db.add_room(roomname)
-        if ret == db.NOT_FOUND:
-            raise (wz.NotFound("Chat room db not found."))
-        elif ret == db.DUPLICATE:
-            raise (wz.NotAcceptable("Chat room name already exists."))
+        args = flavorParser.parse_args()
+        flavor_response = db.update_flavor(flavor_id, args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
+        if flavor_response == db.NOT_FOUND:
+            raise (wz.NotFound("Flavor not found."))
         else:
-            return f"{roomname} added."
+            return f"{flavor_response} added."
 
-
-@api.route('/rooms/delete/<roomname>')
-class DeleteRoom(Resource):
+@api.route('/flavors/delete/<flavor_id>')
+class UpdateFlavor(Resource):
     """
-    This class enables deleting a chat room.
-    While 'Forbidden` is a possible return value, we have not yet implemented
-    a user privileges section, so it isn't used yet.
+    This endpoint deletes a new flavor
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.FORBIDDEN,
-                  'Only the owner of a room can delete it.')
-    def post(self, roomname):
+    def get(self, flavor_id):
         """
-        This method deletes a room from the room db.
+        Update a flavor
         """
-        ret = db.del_room(roomname)
-        if ret == db.NOT_FOUND:
-            raise (wz.NotFound(f"Chat room {roomname} not found."))
+        flavor_response = db.delete_flavor(flavor_id)
+        if flavor_response == db.NOT_FOUND:
+            raise (wz.NotFound("Flavor not found."))
         else:
-            return f"{roomname} deleted."
-
-
-@api.route('/endpoints')
-class Endpoints(Resource):
-    """
-    This class will serve as live, fetchable documentation of what endpoints
-    are available in the system.
-    """
-    @api.response(HTTPStatus.OK, 'Success')
-    def get(self):
-        """
-        The `get()` method will return a list of available endpoints.
-        """
-        endpoints = sorted(rule.rule for rule in api.app.url_map.iter_rules())
-        return {"Available endpoints": endpoints}
-
-
-@api.route('/users/list')
-class ListUsers(Resource):
-    """
-    This endpoint returns a list of all users.
-    """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    def get(self):
-        """
-        Returns a list of all users.
-        """
-        users = db.get_users()
-        if users is None:
-            raise (wz.NotFound("User db not found."))
-        else:
-            return users
-
-
-@api.route('/users/create/<username>')
-class CreateUser(Resource):
-    """
-    This class supports adding a user to the chat room.
-    """
-    @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    def post(self, username):
-        """
-        This method adds a user to the chatroom.
-        """
-        """
-        This method adds a room to the room db.
-        """
-        ret = db.add_user(username)
-        if ret == db.NOT_FOUND:
-            raise (wz.NotFound("User db not found."))
-        elif ret == db.DUPLICATE:
-            raise (wz.NotAcceptable("User name already exists."))
-        return f"{username} added."
+            return f"{flavor_response} deleted."

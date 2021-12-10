@@ -38,13 +38,23 @@ def get_client():
         print("Local Mongo")
         client = pm.MongoClient()
     else:
-        # uri = f"mongodb://{cloud_db_url}:{username}@{passwd}"
         uri = f"mongodb+srv://{username}:{passwd}@{cloud_db_url}/ice_cream_emporium_prod?{db_params}"
-        
         client = pm.MongoClient(uri)
-        # client = pm.MongoClient(f"mongodb://{username}:{passwd}.@{cloud_db_url}"
-        #                         + f"/{DB_NAME}?{db_params}")
     return client
+
+
+def generate_id():
+    """
+    Generates a Mongo ObjectID
+    """
+    return bsutil.ObjectId()
+
+
+def convert_to_object_id(flavor_id):
+    """
+    Convert to a Mongo ObjectID
+    """
+    return bsutil.ObjectId(flavor_id)
 
 
 def fetch_all_flavors():
@@ -61,11 +71,20 @@ def fetch_all_flavors():
     return all_flavors
 
 
-def generate_id():
-    """
-    Generates a Mongo ObjectID
-    """
-    return bsutil.ObjectId()
+def fetch_flavor_details(flavor_id):
+    find_object = {"_id": convert_to_object_id(flavor_id)}
+    response = client[DB_NAME]['flavor'].find_one(find_object)
+    json_response = json.loads(bsutil.dumps(response))
+    flavor_object = {
+        "flavorID": json_response["_id"]["$oid"],
+        "flavorName": json_response["flavorName"],
+        "flavorImage": json_response["flavorImage"],
+        "flavorDescription": json_response["flavorDescription"],
+        "flavorNutrition": json_response["flavorNutrition"],
+        "flavorPrice": json_response["flavorPrice"],
+        "flavorAvailability": json_response["flavorAvailability"]
+    }
+    return flavor_object
 
 
 def create_flavor(flavor_object):
@@ -73,3 +92,25 @@ def create_flavor(flavor_object):
     Adds a new flavor object to the database
     """
     return client[DB_NAME]['flavor'].insert_one(flavor_object)
+
+
+def update_flavor(flavor_id, flavor_object):
+    """
+    Update flavor object to database
+    """
+    filter = {"_id": convert_to_object_id(flavor_id)}
+    new_values = { "$set": flavor_object }
+    try:
+        return client[DB_NAME]['flavor'].update_one(filter, new_values)
+    except:
+        return None
+
+def delete_flavor(flavor_id):
+    """
+    Delete flavor from database
+    """
+    filter = {"_id": convert_to_object_id(flavor_id)}
+    try:
+        return client[DB_NAME]['flavor'].delete_one(filter)
+    except:
+        return None

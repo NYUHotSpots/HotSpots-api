@@ -5,15 +5,13 @@ Gradually, we will fill in actual calls to our datastore.
 """
 
 import os
-import db
-
+import re
 import db.db_connect as dbc
 
 ICECREAMPATH = os.environ["IceCreamPath"]
 TEST_MODE = os.environ.get("TEST_MODE", 0)
 
 if TEST_MODE == 0:
-    # this one should be changed!
     DB_NAME = "ice_cream_emporium_dev"
 else:
     DB_NAME = "ice_cream_emporium_prod"
@@ -31,21 +29,27 @@ OK = 0
 NOT_FOUND = 1
 DUPLICATE = 2
 
-
 client = dbc.get_client()
 print(client)
 
 
 def get_flavors():
     """
-    A function to return a list of all flavors.
+    Return a list of all flavors.
     """
     return dbc.fetch_all_flavors()
 
 
+def get_flavor_detail(flavor_id):
+    response = dbc.fetch_flavor_details(flavor_id)
+    if response == None:
+        return NOT_FOUND
+    return response
+    
+
 def add_flavor(flavor_name, flavor_image, flavor_description, flavor_nutrition, flavor_price, flavor_availability):
     """
-    A function to return a dictionary of all flavors.
+    Return a dictionary of created flavors.
     """
     flavor_object = {
         "_id": dbc.generate_id(),
@@ -60,53 +64,32 @@ def add_flavor(flavor_name, flavor_image, flavor_description, flavor_nutrition, 
     return dbc.create_flavor(flavor_object)
 
 
-def room_exists(roomname):
-    rooms = get_rooms()
-    return roomname in rooms
+def check_flavor_exists(flavorID):
+    flavors = get_flavors()
+    return flavorID in flavors
 
 
-def del_room(roomname):
+def update_flavor(flavor_id, flavor_name, flavor_image, flavor_description, flavor_nutrition, flavor_price, flavor_availability):
     """
-    Delete roomname from the db.
+    Return a dictionary of updated flavor.
     """
-    if not room_exists(roomname):
+    flavor_object = {
+        "flavorName": flavor_name,
+        "flavorImage": flavor_image,
+        "flavorDescription": flavor_description,
+        "flavorNutrition": flavor_nutrition,
+        "flavorPrice": flavor_price,
+        "flavorAvailability": flavor_availability
+    }
+    print("Updated flavor object", flavor_object)
+    response = dbc.update_flavor(flavor_id, flavor_object)
+    if response == None:
         return NOT_FOUND
-    return OK
+    return response
 
 
-def add_room(roomname):
+def delete_flavor(flavor_id):
     """
-    Add a room to the room database.
+    Deletes a flavor
     """
-    rooms = get_rooms()
-    if rooms is None:
-        return NOT_FOUND
-    elif roomname in rooms:
-        return DUPLICATE
-    else:
-        rooms[roomname] = {"num_users": 0}
-        dbc.insert_doc(ROOMS, {ROOM_NM: roomname, NUM_USERS: 0})
-        return OK
-
-
-def get_users():
-    """
-    A function to return a dictionary of all users.
-    """
-    return dbc.fetch_all(USERS, USER_NM)
-
-
-def add_user(username):
-    """
-    Add a user to the user database.
-    Until we are using a real DB, we have a potential
-    race condition here.
-    """
-    users = get_users()
-    if users is None:
-        return NOT_FOUND
-    elif username in users:
-        return DUPLICATE
-    else:
-        dbc.insert_doc(USERS, {USER_NM: username})
-        return OK
+    dbc.delete_flavor()
