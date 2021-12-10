@@ -1,6 +1,10 @@
 # Welcome to Professor Callahan’s Ice Cream Emporium
 
-[![Build Status](https://app.travis-ci.com/ColdScoop/ice-cream-store.svg?branch=main)](https://app.travis-ci.com/ColdScoop/ice-cream-store)
+![GitHub Actions](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions/workflows/main.yml/badge.svg)
+
+[Heroku App](https://profcallahansicecreamemporium.herokuapp.com/)
+
+[MongoDB](https://cloud.mongodb.com/v2/61b3516ea6d4b104e30a1e6b#clusters)
 
 ## Requirements
 
@@ -77,5 +81,5 @@ mongosh
 
 ### Atlas
 ```
-mongosh "mongodb+srv://cluster0.xjsf0.mongodb.net/myFirstDatabase" --username prof
+mongosh "mongodb+srv://cluster0.xjsf0.mongodb.net/ice_cream_emporium_prod" --username prof
 ```
