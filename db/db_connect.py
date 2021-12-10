@@ -79,7 +79,8 @@ def create_flavor(flavor_object):
     Adds a new flavor object to the database
     """
     try:
-        return client[DB_NAME]['flavor'].insert_one(flavor_object)
+        client[DB_NAME]['flavor'].insert_one(flavor_object)
+        return str(flavor_object["_id"])
     except pm.errors.DuplicateKeyError:
         return None
 

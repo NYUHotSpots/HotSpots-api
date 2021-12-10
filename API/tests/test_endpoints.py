@@ -13,7 +13,7 @@ class EndpointTestCase(TestCase):
         self.app = ep.app
         self.app.config['TESTING'] = True
         self.client = self.app.test_client()
-        self.data = {
+        self.flavorData = {
             "flavorName": "TEST FLAVOR",
             "flavorImage": "WWW.GOOGLE.COM",
             "flavorDescription": "TEST DESCRIPTION",
@@ -21,7 +21,7 @@ class EndpointTestCase(TestCase):
             "flavorPrice": 1,
             "flavorAvailability": True
         }
-        self.updatedData = {
+        self.updatedFlavorData = {
             "flavorName": "UPDATE TEST FLAVOR",
             "flavorImage": "UPDATE WWW.GOOGLE.COM",
             "flavorDescription": "UPDATE DESCRIPTION",
@@ -29,12 +29,18 @@ class EndpointTestCase(TestCase):
             "flavorPrice": 2,
             "flavorAvailability": False
         }
+        self.reviewData = {
+            "reviewName": "TEST REVIEW",
+            "flavorID": "123",
+            "reviewText": "TEST TEXT"
+        }
 
     def tearDown(self):
         print("Tear Down")
 
     def test_hello(self):
         response = self.client.get("/hello")
+        print(response.data)
         self.assertEqual(response.status_code, 200)
 
     def test_get_flavor(self):
@@ -43,28 +49,25 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_create_update_delete_flavor(self):
-        response = self.client.post("/flavors", data=self.data)
-        print("Test Create Flavor", response.data)
+        response = self.client.post("/flavors", data=self.flavorData)
+        print(response.data)
+        id = response.data.decode("utf-8").strip().strip("\"")
+        print("Test Create Flavor", id)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.put("/flavors/61b39abfb5110a3a71c2cb4a", data=self.updatedData)
+        response = self.client.get(f"/flavors/{id}")
+        print("Test Get Flavor", response.data)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.put(f"/flavors/{id}", data=self.updatedFlavorData)
         print("Test Update Flavor", response.data)
         self.assertEqual(response.status_code, 200)
 
-        
-
-    def test_create_flavor(self):
-        response = self.client.post("/flavors", data=self.data)
-        print("Test Create Flavor", response.data)
+        response = self.client.delete(f"/flavors/{id}")
+        print("Test Delete Flavor", response.data)
         self.assertEqual(response.status_code, 200)
-
-    def test_update_flavor(self):
-        response = self.client.put("/flavors/61b39abfb5110a3a71c2cb4a", data=self.updatedData)
-        print("Test Update Flavor", response.data)
-        self.assertEqual(response.status_code, 200)
-
-    def test_delete_flavor(self):
-        self.assertTrue(True)
 
     def test_create_review(self):
-        self.assertTrue(True)
+        response = self.client.post("/reviews", data=self.reviewData)
+        print("Test Create Review", response)
+        self.assertEqual(response.status_code, 200)

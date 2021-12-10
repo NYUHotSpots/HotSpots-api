@@ -75,7 +75,7 @@ class Flavor(Resource):
         if flavor_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
-            return f"{flavor_response} added."
+            return flavor_response
 
 
 @api.route('/flavors/<flavor_id>')
