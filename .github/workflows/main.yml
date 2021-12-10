@@ -35,15 +35,15 @@ jobs:
           env
 
       - name: Run Tests
+        env:
+          IceCreamPath: ${{ secrets.ICECREAMPATH }}
+          MONGO_PASSWD: ${{ secrets.MONGO_PASSWD }}
+          TEST_MODE: ${{ secrets.TEST_MODE }}
         run: |
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD
-          export IceCreamPath=$PWD
-          export TEST_MODE=0
-          export LOCAL_MONGO=1
 
           echo $IceCreamPath
           echo $TEST_MODE
-          echo $MONGO_PASSWD          
 
           make all_tests
