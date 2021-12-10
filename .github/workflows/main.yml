@@ -34,6 +34,9 @@ jobs:
         run: |
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD
+          export IceCreamPath=$PWD
+          export TEST_MODE=0
+          export LOCAL_MONGO=1
 
           echo $IceCreamPath
           echo $TEST_MODE
