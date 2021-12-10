@@ -42,6 +42,17 @@ class EndpointTestCase(TestCase):
         print(response.data)
         self.assertEqual(response.status_code, 200)
 
+    def test_create_update_delete_flavor(self):
+        response = self.client.post("/flavors", data=self.data)
+        print("Test Create Flavor", response.data)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.put("/flavors/61b39abfb5110a3a71c2cb4a", data=self.updatedData)
+        print("Test Update Flavor", response.data)
+        self.assertEqual(response.status_code, 200)
+
+        
+
     def test_create_flavor(self):
         response = self.client.post("/flavors", data=self.data)
         print("Test Create Flavor", response.data)
