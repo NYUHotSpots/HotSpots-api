@@ -33,7 +33,7 @@ def get_client():
     Also set global client variable.
     """
     global client
-    LOCAL_MONGO = os.environ.get("LOCAL_MONGO", 1)
+    LOCAL_MONGO = os.environ.get("LOCAL_MONGO", 0)
     if LOCAL_MONGO == 1:
         print("Local Mongo")
         client = pm.MongoClient()
