@@ -12,7 +12,6 @@ dev_env: FORCE
 
 all_tests: FORCE
 	cd $(API_DIR); make tests
-	cd $(DB_DIR); make tests
 
 all_docs: FORCE
 	cd $(API_DIR); make docs

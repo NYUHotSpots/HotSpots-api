@@ -28,5 +28,5 @@ class DBTestCase(TestCase):
         """
         Can we fetch user db?
         """
-        users = db.get_users()
+        users = db.get_flavors()
         self.assertIsInstance(users, dict)

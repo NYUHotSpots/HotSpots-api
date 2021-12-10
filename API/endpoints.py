@@ -12,6 +12,7 @@ import db.data as db
 
 app = Flask(__name__)
 api = Api(app)
+
 flavorParser = reqparse.RequestParser()
 flavorParser.add_argument('flavorName', type=str, location='form')
 flavorParser.add_argument('flavorImage', type=str, location='form')
@@ -19,6 +20,11 @@ flavorParser.add_argument('flavorDescription', type=str, location='form')
 flavorParser.add_argument('flavorNutrition', type=str, location='form')
 flavorParser.add_argument('flavorPrice', type=int, location='form')
 flavorParser.add_argument('flavorAvailability', type=bool, location='form')
+
+reviewParser = reqparse.RequestParser()
+reviewParser.add_argument('reviewName', type=str, location='form')
+reviewParser.add_argument('flavorID', type=str, location='form')
+reviewParser.add_argument('reviewText', type=str, location='form')
 
 
 @api.route('/hello')
@@ -44,7 +50,7 @@ class Flavor(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     def get(self):
         """
-        Returns a list of all flavors
+        Returns a dictionary of all flavors
         """
         flavors = db.get_flavors()
         if flavors is None:
@@ -53,7 +59,6 @@ class Flavor(Resource):
             return flavors
 
     @api.response(HTTPStatus.OK, 'Success')
-    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=flavorParser)
     def post(self):
@@ -61,10 +66,13 @@ class Flavor(Resource):
         Creates a new flavor
         """
         args = flavorParser.parse_args()
-        flavor_response = db.add_flavor(args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
-        if flavor_response == db.NOT_FOUND:
-            raise (wz.NotFound("Flavor not found."))
-        elif flavor_response == db.DUPLICATE:
+        flavor_response = db.add_flavor(args['flavorName'],
+                                        args['flavorImage'],
+                                        args['flavorDescription'],
+                                        args['flavorNutrition'],
+                                        args['flavorPrice'],
+                                        args['flavorAvailability'])
+        if flavor_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
             return f"{flavor_response} added."
@@ -87,7 +95,6 @@ class FlavorDetail(Resource):
         else:
             return flavor_detail
 
-
     """
     This endpoint updates a flavor
     """
@@ -99,12 +106,17 @@ class FlavorDetail(Resource):
         Update a flavor
         """
         args = flavorParser.parse_args()
-        flavor_response = db.update_flavor(flavor_id, args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
+        flavor_response = db.update_flavor(flavor_id,
+                                           args['flavorName'],
+                                           args['flavorImage'],
+                                           args['flavorDescription'],
+                                           args['flavorNutrition'],
+                                           args['flavorPrice'],
+                                           args['flavorAvailability'])
         if flavor_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
             return f"{flavor_response} added."
-
 
     """
     This endpoint deletes a new flavor
@@ -122,61 +134,20 @@ class FlavorDetail(Resource):
             return f"{flavor_response} deleted."
 
 
-# @api.route('/flavors/create')
-# class CreateFlavor(Resource):
-#     """
-#     This endpoint creates a new flavor
-#     """
-#     @api.response(HTTPStatus.OK, 'Success')
-#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-#     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-#     @api.doc(parser=flavorParser)
-#     def post(self):
-#         """
-#         Creates a new flavor
-#         """
-#         args = flavorParser.parse_args()
-#         flavor_response = db.add_flavor(args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
-#         if flavor_response == db.NOT_FOUND:
-#             raise (wz.NotFound("Flavor not found."))
-#         elif flavor_response == db.DUPLICATE:
-#             raise (wz.NotAcceptable("Flavor already exists."))
-#         else:
-#             return f"{flavor_response} added."
-
-
-# @api.route('/flavors/update/<flavor_id>')
-# class UpdateFlavor(Resource):
-#     """
-#     This endpoint updates a flavor
-#     """
-#     @api.response(HTTPStatus.OK, 'Success')
-#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-#     @api.doc(parser=flavorParser)
-#     def post(self, flavor_id):
-#         """
-#         Update a flavor
-#         """
-#         args = flavorParser.parse_args()
-#         flavor_response = db.update_flavor(flavor_id, args['flavorName'], args['flavorImage'], args['flavorDescription'], args['flavorNutrition'], args['flavorPrice'], args['flavorAvailability'])
-#         if flavor_response == db.NOT_FOUND:
-#             raise (wz.NotFound("Flavor not found."))
-#         else:
-#             return f"{flavor_response} added."
-
-# @api.route('/flavors/delete/<flavor_id>')
-# class DeleteFlavor(Resource):
-#     """
-#     This endpoint deletes a new flavor
-#     """
-#     @api.response(HTTPStatus.OK, 'Success')
-#     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-#     def get(self, flavor_id):
-#         """
-#         Delete a flavor
-#         """
-#         flavor_response = db.delete_flavor(flavor_id)
-#         if flavor_response == db.NOT_FOUND:
-#             raise (wz.NotFound("Flavor not found."))
-#         else:
-#             return f"{flavor_response} deleted."
+@api.route('/reviews')
+class Review(Resource):
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @api.doc(parser=reviewParser)
+    def post(self):
+        """
+        Creates a new flavor
+        """
+        args = reviewParser.parse_args()
+        review_response = db.add_review(args['reviewName'],
+                                        args['flavorID'],
+                                        args['reviewText'])
+        if review_response == db.DUPLICATE:
+            raise (wz.NotAcceptable("Flavor already exists."))
+        else:
+            return f"{review_response} added."

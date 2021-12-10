@@ -4,77 +4,56 @@ This file holds the tests for endpoints.py.
 
 from unittest import TestCase, skip 
 from flask_restx import Resource, Api
-import random
 
 import API.endpoints as ep
 import db.data as db
 
-HUGE_NUM = 10000000000000  # any big number will do!
-
-
-def new_entity_name(entity_type):
-    int_name = random.randint(0, HUGE_NUM)
-    return f"new {entity_type}" + str(int_name)
-
-
 class EndpointTestCase(TestCase):
     def setUp(self):
-        pass
+        self.app = ep.app
+        self.app.config['TESTING'] = True
+        self.client = self.app.test_client()
+        self.data = {
+            "flavorName": "TEST FLAVOR",
+            "flavorImage": "WWW.GOOGLE.COM",
+            "flavorDescription": "TEST DESCRIPTION",
+            "flavorNutrition": "TEST NUTRITION",
+            "flavorPrice": 1,
+            "flavorAvailability": True
+        }
+        self.updatedData = {
+            "flavorName": "UPDATE TEST FLAVOR",
+            "flavorImage": "UPDATE WWW.GOOGLE.COM",
+            "flavorDescription": "UPDATE DESCRIPTION",
+            "flavorNutrition": "UPDATE NUTRITION",
+            "flavorPrice": 2,
+            "flavorAvailability": False
+        }
 
     def tearDown(self):
-        pass
+        print("Tear Down")
 
     def test_hello(self):
-        hello = ep.HelloWorld(Resource)
-        ret = hello.get()
-        self.assertIsInstance(ret, dict)
-        self.assertIn(ep.HELLO, ret)
+        response = self.client.get("/hello")
+        self.assertEqual(response.status_code, 200)
 
-    @skip("In the middle of making this work.")
-    def test_create_user(self):
-        """
-        See if we can successfully create a new user.
-        Post-condition: user is in DB.
-        """
-        cu = ep.CreateUser(Resource)
-        new_user = new_entity_name("user")
-        ret = cu.post(new_user)
-        users = db.get_users()
-        self.assertIn(new_user, users)
+    def test_get_flavor(self):
+        response = self.client.get("/flavors")
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
 
-    def test_create_room(self):
-        """
-        See if we can successfully create a new room.
-        Post-condition: room is in DB.
-        """
-        cr = ep.CreateRoom(Resource)
-        new_room = new_entity_name("room")
-        ret = cr.post(new_room)
-        rooms = db.get_rooms()
-        self.assertIn(new_room, rooms)
+    def test_create_flavor(self):
+        response = self.client.post("/flavors", data=self.data)
+        print("Test Create Flavor", response.data)
+        self.assertEqual(response.status_code, 200)
 
-    def test_list_rooms1(self):
-        """
-        Post-condition 1: return is a dictionary.
-        """
-        lr = ep.ListRooms(Resource)
-        ret = lr.get()
-        self.assertIsInstance(ret, dict)
+    def test_update_flavor(self):
+        response = self.client.put("/flavors/61b39abfb5110a3a71c2cb4a", data=self.updatedData)
+        print("Test Update Flavor", response.data)
+        self.assertEqual(response.status_code, 200)
 
-    def test_list_rooms2(self):
-        """
-        Post-condition 2: keys to the dict are strings
-        """
-        lr = ep.ListRooms(Resource)
-        ret = lr.get()
-        for key in ret:
-            self.assertIsInstance(key, str)
+    def test_delete_flavor(self):
+        self.assertTrue(True)
 
-    def test_list_rooms3(self):
-        """
-        Post-condition 3: the values in the dict are themselves dicts
-        """
-        lr = ep.ListRooms(Resource)
-        ret = lr.get()
-        for val in ret.values():
-            self.assertIsInstance(val, dict)
+    def test_create_review(self):
+        self.assertTrue(True)

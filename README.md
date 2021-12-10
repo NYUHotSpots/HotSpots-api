@@ -17,13 +17,13 @@
 ## Design
 
 - Flavor Endpoints
-  - [X] GET /flavors/ GetFlavors
-  - [X] GET /flavors/{flavorID} GetFlavorDetail
-  - [X] POST /flavors/create CreateFlavor
-  - [X] POST /flavors/update UpdateFlavor
-  - [ ] POST /flavors/delete DeleteFlavor
+  - [X] GET /flavors Gets all flavors
+  - [X] GET /flavors/{flavorID} Gets details of one flavor
+  - [X] POST /flavors Creates a flavor
+  - [X] PUT /flavors Updates a flavor
+  - [X] DELETE /flavors Deletes a flavor
 - Review Endpoints
-  - [ ] POST /review/create CreateReview
+  - [X] POST /reviews Creates a review
 
 ## Details
 

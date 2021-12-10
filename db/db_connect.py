@@ -15,7 +15,7 @@ db_params = "retryWrites=true&w=majority"
 
 
 TEST_MODE = os.environ.get("TEST_MODE", 0)
-if TEST_MODE == 0:
+if TEST_MODE == "0":
     # this one should be changed!
     DB_NAME = "ice_cream_emporium_dev"
 else:
@@ -38,8 +38,11 @@ def get_client():
         print("Local Mongo")
         client = pm.MongoClient()
     else:
-        uri = f"mongodb+srv://{username}:{passwd}@{cloud_db_url}/ice_cream_emporium_prod?{db_params}"
-        client = pm.MongoClient(uri)
+        # uri = f"mongodb+srv://{username}:{passwd}@{cloud_db_url}"
+        #       + f"/ice_cream_emporium_prod?{db_params}"
+        client = pm.MongoClient(f"mongodb+srv://{username}:{passwd}"
+                                + f"@{cloud_db_url}/ice_cream_emporium_prod"
+                                + f"?{db_params}")
     return client
 
 
@@ -71,6 +74,16 @@ def fetch_all_flavors():
     return all_flavors
 
 
+def create_flavor(flavor_object):
+    """
+    Adds a new flavor object to the database
+    """
+    try:
+        return client[DB_NAME]['flavor'].insert_one(flavor_object)
+    except pm.errors.DuplicateKeyError:
+        return None
+
+
 def fetch_flavor_details(flavor_id):
     find_object = {"_id": convert_to_object_id(flavor_id)}
     response = client[DB_NAME]['flavor'].find_one(find_object)
@@ -87,23 +100,17 @@ def fetch_flavor_details(flavor_id):
     return flavor_object
 
 
-def create_flavor(flavor_object):
-    """
-    Adds a new flavor object to the database
-    """
-    return client[DB_NAME]['flavor'].insert_one(flavor_object)
-
-
 def update_flavor(flavor_id, flavor_object):
     """
     Update flavor object to database
     """
     filter = {"_id": convert_to_object_id(flavor_id)}
-    new_values = { "$set": flavor_object }
+    new_values = {"$set": flavor_object}
     try:
         return client[DB_NAME]['flavor'].update_one(filter, new_values)
-    except:
+    except pm.errors.DuplicateKeyError:
         return None
+
 
 def delete_flavor(flavor_id):
     """
@@ -112,5 +119,9 @@ def delete_flavor(flavor_id):
     filter = {"_id": convert_to_object_id(flavor_id)}
     try:
         return client[DB_NAME]['flavor'].delete_one(filter)
-    except:
+    except pm.errors.DuplicateKeyError:
         return None
+
+
+def create_review(review_object):
+    return client[DB_NAME]['review'].insert_one(review_object)
