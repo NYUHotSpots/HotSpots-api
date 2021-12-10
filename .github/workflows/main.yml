@@ -35,7 +35,7 @@ jobs:
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD
 
-          echo $DB_Path
+          echo $IceCreamPath
           echo $TEST_MODE
           echo $MONGO_PASSWD          
 
