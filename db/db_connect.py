@@ -42,7 +42,7 @@ def get_client():
         #       + f"/ice_cream_emporium_prod?{db_params}"
         client = pm.MongoClient(f"mongodb+srv://{username}:{passwd}"
                                 + f"@{cloud_db_url}/ice_cream_emporium_prod"
-                                + f"?{db_params}")
+                                + f"?{db_params}", connect=False)
     return client
 
 
