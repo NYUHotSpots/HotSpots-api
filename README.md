@@ -1,6 +1,6 @@
 # Welcome to Professor Callahan’s Ice Cream Emporium
 
-![GitHub Actions](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions/workflows/main.yml/badge.svg)
+[![GitHub Actions Build Status](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions/workflows/main.yml/badge.svg)](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions)
 
 [Heroku App](https://profcallahansicecreamemporium.herokuapp.com/)
 
@@ -67,6 +67,14 @@
 1. python3 -m venv env
 2. source env/bin/activate
 3. pip install -r requirements-dev.txt
+
+### Environment
+```
+export IceCreamPath=/Users/***/Desktop/Prof-Callahans-Ice-Cream-Emporium/
+export LOCAL_MONGO=1
+export TEST_MODE=0
+export MONGO_PASSWD=***
+```
 
 ### Building
 - To build production, type `make prod`.
