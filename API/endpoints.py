@@ -141,7 +141,7 @@ class Review(Resource):
     @api.doc(parser=reviewParser)
     def post(self):
         """
-        Creates a new flavor
+        Creates a new review
         """
         args = reviewParser.parse_args()
         review_response = db.add_review(args['reviewName'],
