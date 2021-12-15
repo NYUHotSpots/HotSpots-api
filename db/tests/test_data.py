@@ -19,5 +19,3 @@ class DBTestCase(TestCase):
         flavors = db.get_flavors()
         self.assertIsInstance(flavors, dict)
 
-    def test_get_review(self):
-        pass

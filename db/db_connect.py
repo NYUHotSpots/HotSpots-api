@@ -3,6 +3,7 @@ This file contains some common MongoDB code.
 """
 import os
 import json
+import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
 
@@ -34,7 +35,7 @@ def get_client():
     global client
     LOCAL_MONGO = os.environ.get("LOCAL_MONGO", 0)
     if LOCAL_MONGO == 1:
-        print("Local Mongo")
+        LOG.info("Local Mongo")
         client = pm.MongoClient()
     else:
         # uri = f"mongodb+srv://{username}:{passwd}@{cloud_db_url}"
@@ -64,7 +65,7 @@ def fetch_all_flavors():
     Returns a dictionary object of all flavors matching id to flavorName
     """
     all_flavors = dict()
-    print("Fetching All Flavors")
+    LOG.info("Fetching All Flavors")
     flavors = client[DB_NAME]["flavor"].find()
     for flavor in flavors:
         id = str(flavor["_id"])
@@ -77,16 +78,22 @@ def create_flavor(flavor_object):
     """
     Adds a new flavor object to the database
     """
+    LOG.info("Attempting flavor creation")
     try:
         client[DB_NAME]['flavor'].insert_one(flavor_object)
+        LOG.info("Successfully created flavor " + str(flavor_object["_id"]))
         return str(flavor_object["_id"])
     except pm.errors.DuplicateKeyError:
+        LOG.error("Duplicate key, unable to create existing flavor")
         return None
 
 
 def fetch_flavor_details(flavor_id):
     find_object = {"_id": convert_to_object_id(flavor_id)}
-    response = client[DB_NAME]['flavor'].find_one(find_object)
+    try:
+        response = client[DB_NAME]['flavor'].find_one(find_object)
+    except pm.errors.KeyNotFound:
+        LOG.error("Unable to find flavor with id " + flavor_id)
     json_response = json.loads(bsutil.dumps(response))
     flavor_object = {
         "flavorID": json_response["_id"]["$oid"],
@@ -106,9 +113,17 @@ def update_flavor(flavor_id, flavor_object):
     """
     filter = {"_id": convert_to_object_id(flavor_id)}
     new_values = {"$set": flavor_object}
+    LOG.info("Attempting flavor creation")
     try:
-        return client[DB_NAME]['flavor'].update_one(filter, new_values)
-    except pm.errors.DuplicateKeyError:
+        flavor_creation = client[DB_NAME]['flavor'].update_one(filter,
+                                                               new_values)
+        LOG.info("Successfully created flavor " + str(flavor_id))
+        return flavor_creation
+    except pm.errors.KeyNotFound:
+        LOG.error("Flavor does not exist in DB")
+        return None
+    except pm.errors.UpdateOperationFailed:
+        LOG.error("Error occurred while updating DB, try again later")
         return None
 
 
@@ -117,9 +132,13 @@ def delete_flavor(flavor_id):
     Delete flavor from database
     """
     filter = {"_id": convert_to_object_id(flavor_id)}
+    LOG.info("Attempting flavor deletion")
     try:
-        return client[DB_NAME]['flavor'].delete_one(filter)
-    except pm.errors.DuplicateKeyError:
+        flavor_deletion = client[DB_NAME]['flavor'].delete_one(filter)
+        LOG.info("Successfully created flavor " + str(flavor_id))
+        return flavor_deletion
+    except pm.errors.KeyNotFound:
+        LOG.error("Flavor does not exist in DB")
         return None
 
 
