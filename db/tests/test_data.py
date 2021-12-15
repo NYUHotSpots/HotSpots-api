@@ -12,9 +12,12 @@ class DBTestCase(TestCase):
     def tearDown(self):
         pass
 
-    def test_get_users(self):
+    def test_get_flavors(self):
         """
         Can we fetch user db?
         """
-        users = db.get_flavors()
-        self.assertIsInstance(users, dict)
+        flavors = db.get_flavors()
+        self.assertIsInstance(flavors, dict)
+
+    def test_get_review(self):
+        pass
