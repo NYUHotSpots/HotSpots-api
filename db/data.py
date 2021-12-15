@@ -39,20 +39,10 @@ def get_flavor_detail(flavor_id):
     return response
 
 
-def add_flavor(flavor_name, flavor_image, flavor_description,
-               flavor_nutrition, flavor_price, flavor_availability):
+def add_flavor(flavor_object):
     """
     Return a dictionary of created flavors.
     """
-    flavor_object = {
-        "_id": dbc.generate_id(),
-        "flavorName": flavor_name,
-        "flavorImage": flavor_image,
-        "flavorDescription": flavor_description,
-        "flavorNutrition": flavor_nutrition,
-        "flavorPrice": flavor_price,
-        "flavorAvailability": flavor_availability
-    }
     print("Create flavor object", flavor_object)
     response = dbc.create_flavor(flavor_object)
     if response is None:
@@ -65,19 +55,10 @@ def check_flavor_exists(flavorID):
     return flavorID in flavors
 
 
-def update_flavor(flavor_id, flavor_name, flavor_image, flavor_description,
-                  flavor_nutrition, flavor_price, flavor_availability):
+def update_flavor(flavor_id, flavor_object):
     """
     Return a dictionary of updated flavor.
     """
-    flavor_object = {
-        "flavorName": flavor_name,
-        "flavorImage": flavor_image,
-        "flavorDescription": flavor_description,
-        "flavorNutrition": flavor_nutrition,
-        "flavorPrice": flavor_price,
-        "flavorAvailability": flavor_availability
-    }
     print("Updated flavor object", flavor_object)
     response = dbc.update_flavor(flavor_id, flavor_object)
     if response is None:

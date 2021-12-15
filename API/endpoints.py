@@ -66,12 +66,13 @@ class Flavor(Resource):
         Creates a new flavor
         """
         args = flavorParser.parse_args()
-        flavor_response = db.add_flavor(args['flavorName'],
-                                        args['flavorImage'],
-                                        args['flavorDescription'],
-                                        args['flavorNutrition'],
-                                        args['flavorPrice'],
-                                        args['flavorAvailability'])
+        flavor_entry = buildFlavorObject(args['flavorName'],
+                                         args['flavorImage'],
+                                         args['flavorDescription'],
+                                         args['flavorNutrition'],
+                                         args['flavorPrice'],
+                                         args['flavorAvailability'])
+        flavor_response = db.add_flavor(flavor_entry)
         if flavor_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
@@ -106,13 +107,13 @@ class FlavorDetail(Resource):
         Update a flavor
         """
         args = flavorParser.parse_args()
-        flavor_response = db.update_flavor(flavor_id,
-                                           args['flavorName'],
-                                           args['flavorImage'],
-                                           args['flavorDescription'],
-                                           args['flavorNutrition'],
-                                           args['flavorPrice'],
-                                           args['flavorAvailability'])
+        flavor_update = buildFlavorObject(args['flavorName'],
+                                          args['flavorImage'],
+                                          args['flavorDescription'],
+                                          args['flavorNutrition'],
+                                          args['flavorPrice'],
+                                          args['flavorAvailability'])
+        flavor_response = db.update_flavor(flavor_id, flavor_update)
         if flavor_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
@@ -151,3 +152,16 @@ class Review(Resource):
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
             return f"{review_response} added."
+
+
+def buildFlavorObject(name, image, description, nutrition,
+                      price, availability, id=None):
+    flavor_object = {
+        "flavorName": name,
+        "flavorImage": image,
+        "flavorDescription": description,
+        "flavorNutrition": nutrition,
+        "flavorPrice": price,
+        "flavorAvailability": availability
+    }
+    return flavor_object
