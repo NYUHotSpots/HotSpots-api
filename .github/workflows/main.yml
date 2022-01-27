@@ -1,4 +1,4 @@
-name: Prof Callahan's Ice Cream Emporium
+name: HotSpots API
 
 on:
   push:
@@ -36,14 +36,14 @@ jobs:
 
       - name: Run Tests
         env:
-          IceCreamPath: ${{ secrets.ICECREAMPATH }}
+          IceCreamPath: ${{ secrets.HOTSPOTS_PATH }}
           MONGO_PASSWD: ${{ secrets.MONGO_PASSWD }}
           TEST_MODE: ${{ secrets.TEST_MODE }}
         run: |
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD
 
-          echo $IceCreamPath
+          echo $HOTSPOTS_PATH
           echo $TEST_MODE
 
           make all_tests
@@ -52,5 +52,5 @@ jobs:
         uses: akhileshns/heroku-deploy@v3.12.12
         with:
           heroku_api_key: ${{secrets.HEROKU_API_KEY}}
-          heroku_app_name: profcallahansicecreamemporium
+          heroku_app_name: hotspotsapi
           heroku_email: kc3585@nyu.edu

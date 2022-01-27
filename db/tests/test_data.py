@@ -11,11 +11,3 @@ class DBTestCase(TestCase):
 
     def tearDown(self):
         pass
-
-    def test_get_flavors(self):
-        """
-        Can we fetch user db?
-        """
-        flavors = db.get_flavors()
-        self.assertIsInstance(flavors, dict)
-

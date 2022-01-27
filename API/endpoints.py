@@ -13,19 +13,20 @@ import db.data as db
 app = Flask(__name__)
 api = Api(app)
 
-flavorParser = reqparse.RequestParser()
-flavorParser.add_argument('flavorName', type=str, location='form')
-flavorParser.add_argument('flavorImage', type=str, location='form')
-flavorParser.add_argument('flavorDescription', type=str, location='form')
-flavorParser.add_argument('flavorNutrition', type=str, location='form')
-flavorParser.add_argument('flavorPrice', type=int, location='form')
-flavorParser.add_argument('flavorAvailability', type=bool, location='form')
+spotParser = reqparse.RequestParser()
+spotParser.add_argument('spotName', type=str, location='form')
+spotParser.add_argument('spotImage', type=str, location='form')
+spotParser.add_argument('spotAddress', type=str, location='form')
+spotParser.add_argument('spotCapacity', type=str, location='form')
 
 reviewParser = reqparse.RequestParser()
-reviewParser.add_argument('reviewName', type=str, location='form')
-reviewParser.add_argument('flavorID', type=str, location='form')
+reviewParser.add_argument('spotID', type=str, location='form')
+reviewParser.add_argument('reviewDate', type=str, location='form')
+reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 
+factorParser = reqparse.RequestParser()
+factorParser.add_argument('factorRating', type=int, location='form')
 
 @api.route('/hello')
 class HelloWorld(Resource):
@@ -40,102 +41,106 @@ class HelloWorld(Resource):
         """
         return {"Hola": "Mundo"}
 
-
-@api.route('/flavors')
-class Flavor(Resource):
-    """
-    This endpoint returns a list of all flavors
-    """
+@api.route('/spot')
+class Spot(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     def get(self):
         """
-        Returns a dictionary of all flavors
+        Returns all spots
         """
-        flavors = db.get_flavors()
-        if flavors is None:
-            raise (wz.NotFound("Flavors not found."))
+        spots = db.get_spots()
+        if spots is None:
+            raise (wz.NotFound("Spots not found."))
         else:
-            return flavors
+            return spots
 
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.doc(parser=flavorParser)
+    @api.doc(parser=spotParser)
     def post(self):
         """
-        Creates a new flavor
+        Creates a new spot
         """
-        args = flavorParser.parse_args()
-        flavor_entry = buildFlavorObject(args['flavorName'],
-                                         args['flavorImage'],
-                                         args['flavorDescription'],
-                                         args['flavorNutrition'],
-                                         args['flavorPrice'],
-                                         args['flavorAvailability'])
-        flavor_response = db.add_flavor(flavor_entry)
-        if flavor_response == db.DUPLICATE:
-            raise (wz.NotAcceptable("Flavor already exists."))
+        args = spotParser.parse_args()
+        spot_response = db.add_spot(args['spotName'], args['spotAddress'], args['spotCapacity'], args['spotImage'])
+        if spot_response == db.DUPLICATE:
+            raise (wz.NotAcceptable("Spot already exists."))
         else:
-            return flavor_response
+            return spot_response
 
 
-@api.route('/flavors/<flavor_id>')
-class FlavorDetail(Resource):
+@api.route('/spot/<spot_id>')
+class SpotDetail(Resource):
     """
-    This endpoint returns a details of a flavor
+    This endpoint returns a details of a spot
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    def get(self, flavor_id):
+    def get(self, spot_id):
         """
-        Returns a details of a flavor
+        Returns a details of a spot
         """
-        flavor_detail = db.get_flavor_detail(flavor_id)
-        if flavor_detail == db.NOT_FOUND:
+        spot_details = db.get_spot_detail(spot_id)
+        if spot_details == db.NOT_FOUND:
             raise (wz.NotFound("Flavor detail not found."))
         else:
-            return flavor_detail
+            return spot_details
 
     """
-    This endpoint updates a flavor
+    This endpoint updates a spot
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.doc(parser=flavorParser)
-    def put(self, flavor_id):
+    @api.doc(parser=spotParser)
+    def put(self, spot_id):
         """
         Update a flavor
         """
-        args = flavorParser.parse_args()
-        flavor_update = buildFlavorObject(args['flavorName'],
-                                          args['flavorImage'],
-                                          args['flavorDescription'],
-                                          args['flavorNutrition'],
-                                          args['flavorPrice'],
-                                          args['flavorAvailability'])
-        flavor_response = db.update_flavor(flavor_id, flavor_update)
-        if flavor_response == db.NOT_FOUND:
+        args = spotParser.parse_args()
+        spot_response = db.update_spot(spot_id, args['spotName'], args['spotAddress'], args['spotCapacity'], args['spotImage'])
+        if spot_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
-            return f"{flavor_response} added."
+            return f"{spot_response} added."
 
     """
     This endpoint deletes a new flavor
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    def delete(self, flavor_id):
+    def delete(self, spot_id):
         """
-        Delete a flavor
+        Delete a spot
         """
-        flavor_response = db.delete_flavor(flavor_id)
-        if flavor_response == db.NOT_FOUND:
+        spot_response = db.delete_spot(spot_id)
+        if spot_response == db.NOT_FOUND:
+            raise (wz.NotFound("Spot not found."))
+        else:
+            return f"{spot_response} deleted."
+
+
+@api.route('/spot/availability/<spot_id>')
+class SpotDetail(Resource):
+    """
+    This endpoint updates a spot
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.doc(parser=factorParser)
+    def put(self, spot_id):
+        """
+        Update a spot availability
+        """
+        args = factorParser.parse_args()
+        spot_response = db.update_spot(spot_id, args['factorRating'],)
+        if spot_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
-            return f"{flavor_response} deleted."
+            return f"{spot_response} added."
 
 
-@api.route('/reviews')
+@api.route('/review')
 class Review(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -145,23 +150,27 @@ class Review(Resource):
         Creates a new review
         """
         args = reviewParser.parse_args()
-        review_response = db.add_review(args['reviewName'],
-                                        args['flavorID'],
-                                        args['reviewText'])
+        review_response = db.add_review(args["spotID"], args['reviewDate'], args['reviewTitle'], args['reviewText'])
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
             return f"{review_response} added."
 
 
-def buildFlavorObject(name, image, description, nutrition,
-                      price, availability, id=None):
-    flavor_object = {
-        "flavorName": name,
-        "flavorImage": image,
-        "flavorDescription": description,
-        "flavorNutrition": nutrition,
-        "flavorPrice": price,
-        "flavorAvailability": availability
-    }
-    return flavor_object
+@api.route('/review/<review_id>')
+class ReviewDetail(Resource):
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def delete(self, review_id):
+        """
+        Deletes a new review
+        """
+        review_response = db.delete_review(review_id)
+        if review_response == db.NOT_FOUND:
+            raise (wz.NotFound("Review not found."))
+        else:
+            return f"{review_response} deleted."
+
+
+
+

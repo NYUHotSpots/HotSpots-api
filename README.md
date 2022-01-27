@@ -1,4 +1,4 @@
-# Welcome to Professor Callahan’s Ice Cream Emporium
+# HotSpots API
 
 [![GitHub Actions Build Status](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions/workflows/main.yml/badge.svg)](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions)
 
@@ -6,60 +6,90 @@
 
 [MongoDB](https://cloud.mongodb.com/v2/61b3516ea6d4b104e30a1e6b#clusters)
 
-## Requirements
+## About
 
-- CREATE
-  - flavor
-- READ
-  - list of flavors
-  - flavor
-- UPDATE
-  - flavor
-- DELETE
-  - flavor
+Help students find available study spots around the university based on factors such as availability and noise level by crowsourcing real-time data from student
 
 ## Design
 
-- Flavor Endpoints
-  - [X] GET /flavors Gets all flavors
-  - [X] GET /flavors/{flavorID} Gets details of one flavor
-  - [X] POST /flavors Creates a flavor
-  - [X] PUT /flavors Updates a flavor
-  - [X] DELETE /flavors Deletes a flavor
-- Review Endpoints
-  - [X] POST /reviews Creates a review
+Cluster: Cluster0
+Database: hotspots_dev
 
-## Details
+Collections: Spots
+{
+  spotID,
+  spotName,
+  spotAddress,
+  spotCapacity,
+  spotImage,
+  factorAvailabiliity: {
+    factorDate,
+    factorValue,
+    factorNumOfInputs
+  },
+  factorNoiseLevel: {
+    factorDate,
+    factorValue,
+    factorCount
+  },
+  factorTemperature: {
+    factorDate,
+    factorValue,
+    factorCount
+  },
+  factorAmbiance: {
+    factorDate,
+    factorValue,
+    factorCount
+  },
+  reviews: [
+    ObjectID("reviewID")
+  ]
+}
 
-### Ideas
-- Flavor Offerings
-  - Gingerbread House
-  - Peppermint
-  - Chocolate Chip Cookie Dough
-  - Chocolate
-  - Vanilla
-  - Caramel
-  - Mint Chocolate Chip
-  - Butter Pecan
-  - Strawberry
-  - Cookies ‘N Cream (Oreo)
-  - Neapolitan
-  - Rocky Road
 
-### Objects
-- Flavor
-  - flavorID
-  - flavorName
-  - flavorImage
-  - flavorDescription
-  - flavorNutrition
-  - flavorPrice
-  - flavorAvailability
+Collections: Reviews
+{
+  reviewID,
+  reviewDate,
+  reviewTitle,
+  reviewText
+}
 
-- Review
-  - reviewID
-  - flavorID
-  - reviewText
+### Requirements
+
+- CREATE
+  - spot
+  - review
+- READ
+  - all spot + availability
+  - one spot + all factors
+- UPDATE
+  - spot availability
+  - spot noise level
+  - spot temperature
+  - spot ambiance
+- DELETE
+  - spot
+  - review
+
+### Endpoints
+
+- CREATE
+  - [X] POST /spot
+  - [X] POST /review
+- READ
+  - [X] GET /spot (return all spot documents including: spotID, spotName, spotAddress, spotImage, factorAvailability)
+  - [X] GET /spot/{spotID} (returns one spot document including: spotID, spotName, spotAddress, spotCapacity, spotImage, factorAvailabiliity, factorNoiseLevel, factorTemperature, factorAmbiance)
+- UPDATE
+  - [X] PUT /spot/{spotID}
+  - [ ] PUT /spot/availability/{spotID}
+  - [ ] PUT /spot/noiselevel/{spotID}
+  - [ ] PUT /spot/temperature/{spotID}
+  - [ ] PUT /spot/ambiance/{spotID}
+- DELETE
+  - [X] DELETE /spot/{spotID}
+  - [X] DELETE /review/{reviewID}
 
 ## Setup
 
@@ -67,14 +97,19 @@
 1. python3 -m venv env
 2. source env/bin/activate
 3. pip install -r requirements-dev.txt
-
-### Environment
-```
-export IceCreamPath=/Users/***/Desktop/Prof-Callahans-Ice-Cream-Emporium/
-export LOCAL_MONGO=1
-export TEST_MODE=0
-export MONGO_PASSWD=***
-```
+4. add to a new .env file
+  ```
+  HOTSPOTS_PATH=***
+  LOCAL_MONGO=1
+  TEST_MODE=0
+  MONGO_URL=cluster0.empfo.mongodb.net
+  MONGO_USER=hot
+  MONGO_PASSWD=***
+  MONGO_DEV=hotspots_dev
+  MONGO_PROD=hotspots_prod
+  ```
+    - LOCAL_MONGO (0 = NOT LOCAL, 1 = IS LOCAL)
+    - TEST_MODE (0 = IS TESTING, 1 = NOT TESTING)
 
 ### Building
 - To build production, type `make prod`.
@@ -85,9 +120,11 @@ export MONGO_PASSWD=***
 ### Local
 ```
 mongosh
+use hotspots
+db.spots.find()
 ```
 
 ### Atlas
 ```
-mongosh "mongodb+srv://cluster0.xjsf0.mongodb.net/ice_cream_emporium_prod" --username prof
+mongosh "mongodb+srv://cluster0.empfo.mongodb.net/hotspots" --username hot
 ```
