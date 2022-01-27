@@ -1,10 +1,10 @@
 # HotSpots API
 
-[![GitHub Actions Build Status](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions/workflows/main.yml/badge.svg)](https://github.com/ColdScoop/Prof-Callahans-Ice-Cream-Emporium/actions)
+[![GitHub Actions Build Status](https://github.com/NYUHotSpots/HotSpots-api/actions/workflows/main.yml/badge.svg)](https://github.com/NYUHotSpots/HotSpots-api/actions)
 
-[Heroku App](https://profcallahansicecreamemporium.herokuapp.com/)
+[Heroku App](https://hotspotsapi.herokuapp.com/)
 
-[MongoDB](https://cloud.mongodb.com/v2/61b3516ea6d4b104e30a1e6b#clusters)
+[MongoDB](https://cloud.mongodb.com/v2/61f12b273f1f376f02f6ac37#clusters)
 
 ## About
 
@@ -100,7 +100,7 @@ Collections: Reviews
 4. add to a new .env file
   ```
   HOTSPOTS_PATH=***
-  LOCAL_MONGO=1
+  LOCAL_DB=1
   TEST_MODE=0
   MONGO_URL=cluster0.empfo.mongodb.net
   MONGO_USER=hot
@@ -108,7 +108,7 @@ Collections: Reviews
   MONGO_DEV=hotspots_dev
   MONGO_PROD=hotspots_prod
   ```
-    - LOCAL_MONGO (0 = NOT LOCAL, 1 = IS LOCAL)
+    - LOCAL_DB (0 = IS LOCAL, 1 = NOT LOCAL)
     - TEST_MODE (0 = IS TESTING, 1 = NOT TESTING)
 
 ### Building
