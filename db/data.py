@@ -13,7 +13,7 @@ if TEST_MODE == "0":
     DB_NAME = os.environ.get("MONGO_DEV")
 else:
     DB_NAME = os.environ.get("MONGO_PROD")
-    
+
 print("Using DB:", DB_NAME)
 
 OK = 0
@@ -70,6 +70,7 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
         return DUPLICATE
     return response
 
+
 def get_spot_detail(spot_id):
     response = dbc.fetch_spot_details(spot_id)
     if response is None:
@@ -112,6 +113,7 @@ def add_review(spotID, reviewDate, reviewTitle, reviewText):
     }
     print("Create review object", review_object)
     return dbc.create_review(spotID, review_object)
+
 
 def delete_review(reviewID):
     """

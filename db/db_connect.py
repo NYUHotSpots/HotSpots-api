@@ -62,8 +62,10 @@ def convert_to_object_id(flavor_id):
 
 
 def get_all_spots():
-    all_spots_cursor = client[DB_NAME]['spots'].find( { }, { "spotName": 1, "spotAddress": 1, "spotImage": 1, "factorAvailability": 1 } )
-    all_spots = [json.loads(json.dumps(doc, default=bsutil.default)) for doc in all_spots_cursor]
+    all_spots_cursor = client[DB_NAME]['spots'].find(
+        {}, {"spotName": 1, "spotAddress": 1, "spotImage": 1, "factorAvailability": 1})
+    all_spots = [json.loads(json.dumps(doc, default=bsutil.default))
+                 for doc in all_spots_cursor]
     return all_spots
 
 
@@ -86,6 +88,7 @@ def create_spot(spot_document):
     except pm.errors.DuplicateKeyError:
         LOG.error("Duplicate key, unable to create existing flavor")
         return None
+
 
 def fetch_spot_details(spot_id):
     find_object = {"_id": convert_to_object_id(spot_id)}
