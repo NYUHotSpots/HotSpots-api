@@ -26,7 +26,10 @@ reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 
 factorParser = reqparse.RequestParser()
-factorParser.add_argument('factorRating', type=int, location='form')
+factorParser.add_argument('factorAvailabiliity', type=int, location='form')
+factorParser.add_argument('factorNoiseLevel', type=int, location='form')
+factorParser.add_argument('factorTemperature', type=int, location='form')
+factorParser.add_argument('factorAmbiance', type=int, location='form')
 
 
 @api.route('/hello')
