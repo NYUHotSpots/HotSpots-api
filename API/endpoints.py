@@ -28,6 +28,7 @@ reviewParser.add_argument('reviewText', type=str, location='form')
 factorParser = reqparse.RequestParser()
 factorParser.add_argument('factorRating', type=int, location='form')
 
+
 @api.route('/hello')
 class HelloWorld(Resource):
     """
@@ -40,6 +41,7 @@ class HelloWorld(Resource):
         It just answers with "hello world."
         """
         return {"Hola": "Mundo"}
+
 
 @api.route('/spot')
 class Spot(Resource):
@@ -63,7 +65,8 @@ class Spot(Resource):
         Creates a new spot
         """
         args = spotParser.parse_args()
-        spot_response = db.add_spot(args['spotName'], args['spotAddress'], args['spotCapacity'], args['spotImage'])
+        spot_response = db.add_spot(args['spotName'], args['spotAddress'],
+                                    args['spotCapacity'], args['spotImage'])
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
@@ -86,7 +89,7 @@ class SpotDetail(Resource):
             raise (wz.NotFound("Flavor detail not found."))
         else:
             return spot_details
-
+    '''
     """
     This endpoint updates a spot
     """
@@ -98,7 +101,10 @@ class SpotDetail(Resource):
         Update a flavor
         """
         args = spotParser.parse_args()
-        spot_response = db.update_spot(spot_id, args['spotName'], args['spotAddress'], args['spotCapacity'], args['spotImage'])
+        spot_response = db.update_spot(spot_id, args['spotName'],
+                                                args['spotAddress'],
+                                                args['spotCapacity'],
+                                                args['spotImage'])
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
@@ -118,10 +124,11 @@ class SpotDetail(Resource):
             raise (wz.NotFound("Spot not found."))
         else:
             return f"{spot_response} deleted."
+    '''
 
 
 @api.route('/spot/availability/<spot_id>')
-class SpotDetail(Resource):
+class SpotUpdateDetail(Resource):
     """
     This endpoint updates a spot
     """
@@ -150,7 +157,9 @@ class Review(Resource):
         Creates a new review
         """
         args = reviewParser.parse_args()
-        review_response = db.add_review(args["spotID"], args['reviewDate'], args['reviewTitle'], args['reviewText'])
+        review_response = db.add_review(args["spotID"], args['reviewDate'],
+                                        args['reviewTitle'],
+                                        args['reviewText'])
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
@@ -170,7 +179,3 @@ class ReviewDetail(Resource):
             raise (wz.NotFound("Review not found."))
         else:
             return f"{review_response} deleted."
-
-
-
-
