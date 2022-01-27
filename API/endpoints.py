@@ -89,7 +89,7 @@ class SpotDetail(Resource):
             raise (wz.NotFound("Flavor detail not found."))
         else:
             return spot_details
-    '''
+
     """
     This endpoint updates a spot
     """
@@ -98,13 +98,13 @@ class SpotDetail(Resource):
     @api.doc(parser=spotParser)
     def put(self, spot_id):
         """
-        Update a flavor
+        Update a spot
         """
         args = spotParser.parse_args()
         spot_response = db.update_spot(spot_id, args['spotName'],
-                                                args['spotAddress'],
-                                                args['spotCapacity'],
-                                                args['spotImage'])
+                                       args['spotAddress'],
+                                       args['spotCapacity'],
+                                       args['spotImage'])
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound("Flavor not found."))
         else:
@@ -124,7 +124,6 @@ class SpotDetail(Resource):
             raise (wz.NotFound("Spot not found."))
         else:
             return f"{spot_response} deleted."
-    '''
 
 
 @api.route('/spot/availability/<spot_id>')

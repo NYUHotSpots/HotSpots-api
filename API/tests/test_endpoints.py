@@ -38,15 +38,17 @@ class EndpointTestCase(TestCase):
         response = self.client.post("/spot", data=self.spotData)
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
-        print("Test Create Spot", id)
+        print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)
         
         response = self.client.get(f"/spot/{spot_id}")
         print("Test Get Spot", response.data)
         self.assertEqual(response.status_code, 200)
 
-        # TODO: make spot detail update endpoint first
-        # print(self.updatedSpotData)
-        # response = self.client.put(f"/spot/availability/{spot_id}", data=self.updatedSpotData) this one updates availability only
-        # print("Test Update Spot", response.data)
-        # self.assertEqual(response.status_code, 200)
+        response = self.client.put(f"/spot/{spot_id}", data=self.updatedSpotData)
+        print("Test Update Spot", response.data)
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.delete(f"/spot/{spot_id}")
+        print("Test Delete Spot", response.data)
+        self.assertEqual(response.status_code, 200)
