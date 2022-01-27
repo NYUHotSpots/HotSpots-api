@@ -63,7 +63,8 @@ def convert_to_object_id(flavor_id):
 
 def get_all_spots():
     all_spots_cursor = client[DB_NAME]['spots'].find(
-        {}, {"spotName": 1, "spotAddress": 1, "spotImage": 1, "factorAvailability": 1})
+        {}, {"spotName": 1, "spotAddress": 1,
+             "spotImage": 1, "factorAvailability": 1})
     all_spots = [json.loads(json.dumps(doc, default=bsutil.default))
                  for doc in all_spots_cursor]
     return all_spots
@@ -74,13 +75,6 @@ def create_spot(spot_document):
     Adds a new spot document to collection
     """
     LOG.info("Attempting spot creation")
-    # print("Create Spot Find Duplicate")
-    # cur = client[DB_NAME]['spots'].find({ "spotName": { "$exists": False, "$in": [spot_document["spotName"]] } })
-    # # cur = client[DB_NAME]['spots'].find({ "spotName": {"$size": 0} })
-    # for c in cur:
-    #     print(c)
-    # if client[DB_NAME]['spots'].find({ "spotName": { "$exists": True, "$e": spot_document["spotName"] } }):
-    #     return None
     try:
         client[DB_NAME]['spots'].insert_one(spot_document)
         LOG.info("Successfully created flavor " + str(spot_document["_id"]))

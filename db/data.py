@@ -1,7 +1,4 @@
-from cgitb import Hook
 import os
-from unittest import TestCase
-
 import db.db_connect as dbc
 from dotenv import load_dotenv
 
