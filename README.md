@@ -104,7 +104,7 @@ Collections: Reviews
   TEST_MODE=0
   MONGO_URL=cluster0.empfo.mongodb.net
   MONGO_USER=hot
-  MONGO_PASSWD=***
+  MONGO_PASSWORD=***
   MONGO_DEV=hotspots_dev
   MONGO_PROD=hotspots_prod
   ```
