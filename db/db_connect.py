@@ -13,7 +13,6 @@ load_dotenv()
 username = os.environ.get("MONGO_USER")
 cloud_db_url = os.environ.get("MONGO_URL")
 passwd = os.environ.get("MONGO_PASSWORD")
-print("Username + Password", username, passwd)
 cloud_mdb = "mongodb+srv"
 db_params = "retryWrites=true&w=majority"
 

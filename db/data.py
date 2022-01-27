@@ -7,15 +7,13 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-HOTSPOTS_PATH = os.environ.get("HOTSPOTS_PATH")
 TEST_MODE = os.environ.get("TEST_MODE")
-
-print("PATH + TESTMODE", HOTSPOTS_PATH, TEST_MODE)
 
 if TEST_MODE == "0":
     DB_NAME = os.environ.get("MONGO_DEV")
 else:
     DB_NAME = os.environ.get("MONGO_PROD")
+    
 print("Using DB:", DB_NAME)
 
 OK = 0

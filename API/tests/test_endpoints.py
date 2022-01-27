@@ -10,7 +10,9 @@ import db.data as db
 
 class EndpointTestCase(TestCase):
     def setUp(self):
-        pass
+        self.app = ep.app
+        self.app.config['TESTING'] = True
+        self.client = self.app.test_client()
     
     def tearDown(self):
         print("Tear Down")
