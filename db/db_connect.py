@@ -13,12 +13,12 @@ load_dotenv()
 username = os.environ.get("MONGO_USER")
 cloud_db_url = os.environ.get("MONGO_URL")
 passwd = os.environ.get("MONGO_PASSWORD")
-print(username, passwd)
+print("Username + Password", username, passwd)
 cloud_mdb = "mongodb+srv"
 db_params = "retryWrites=true&w=majority"
 
 
-TEST_MODE = os.environ.get("TEST_MODE", 0)
+TEST_MODE = os.environ.get("TEST_MODE")
 if TEST_MODE == "0":
     DB_NAME = os.environ.get("MONGO_DEV")
 else:
