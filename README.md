@@ -15,7 +15,9 @@ Help students find available study spots around the university based on factors 
 Cluster: Cluster0
 Database: hotspots_dev
 
-Collections: Spots
+Collections: 
+
+spots
 {
   spotID,
   spotName,
