@@ -2,7 +2,7 @@
 This file holds the tests for endpoints.py.
 """
 
-from unittest import TestCase, skip 
+from unittest import TestCase, skip
 from flask_restx import Resource, Api
 
 import datetime

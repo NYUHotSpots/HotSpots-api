@@ -11,11 +11,13 @@
 Help students find available study spots around the university based on factors such as availability and noise level by crowsourcing real-time data from student
 
 ## Design
-
+```
 Cluster: Cluster0
 Database: hotspots_dev
 
-Collections: Spots
+Collections: 
+
+spots
 {
   spotID,
   spotName,
@@ -55,6 +57,7 @@ Collections: Reviews
   reviewTitle,
   reviewText
 }
+```
 
 ### Requirements
 
