@@ -111,7 +111,9 @@ def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
         "reviewRating": reviewRating
     }
     print("Create review object", review_object)
-    return dbc.create_review(spotID, review_object)
+    response = dbc.create_review(spotID, review_object)
+    print("Add Review response: ", response)
+    return response
 
 
 def delete_review(reviewID):

@@ -165,7 +165,7 @@ class Review(Resource):
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
-            return f"{review_response} added."
+            return review_response
 
 
 @api.route('/review/<review_id>')
