@@ -24,6 +24,8 @@ spots
   spotAddress,
   spotCapacity,
   spotImage,
+  spotCreation, 
+  spotUpdate,
   factorAvailabiliity: {
     factorDate,
     factorValue,
@@ -55,7 +57,9 @@ Collections: Reviews
   reviewID,
   reviewDate,
   reviewTitle,
-  reviewText
+  reviewText, 
+  reviewCreation, 
+  reviewUpdate
 }
 ```
 
