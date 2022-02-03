@@ -98,15 +98,17 @@ def delete_spot(spot_id):
     return response
 
 
-def add_review(spotID, reviewDate, reviewTitle, reviewText):
+def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
     """
     Return a dictionary of created review.
     """
     review_object = {
         "_id": dbc.generate_id(),
+        "spotID": spotID,
         "reviewDate": reviewDate,
         "reviewTitle": reviewTitle,
-        "reviewText": reviewText
+        "reviewText": reviewText,
+        "reviewRating": reviewRating
     }
     print("Create review object", review_object)
     return dbc.create_review(spotID, review_object)
