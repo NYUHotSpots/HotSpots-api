@@ -132,7 +132,7 @@ def delete_spot(spot_id):
 
 def create_review(spotID, review_object):
     response = client[DB_NAME]['reviews'].insert_one(review_object)
-    print("Create REview", response)
+    print("Create Review", response)
     filter = {"_id": convert_to_object_id(spotID)}
     new_values = {"$push": {
         "reviews": review_object

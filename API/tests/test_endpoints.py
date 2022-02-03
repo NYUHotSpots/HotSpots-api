@@ -2,9 +2,11 @@
 This file holds the tests for endpoints.py.
 """
 
-from unittest import TestCase, skip 
+from unittest import TestCase, skip
+from urllib import response 
 from flask_restx import Resource, Api
 
+import datetime
 import API.endpoints as ep
 import db.data as db
 
@@ -20,6 +22,14 @@ class EndpointTestCase(TestCase):
         }
         self.updatedSpotData = self.spotData
         self.updatedSpotData["spotCapacity"] = "Low"
+        self.reviewData = {
+            "spotID": "0", 
+            "reviewDate": datetime.datetime.now(), 
+            "reviewTile": "test_endpoints_unit_test", 
+            "reviewText": "wow what a great app", 
+            "reviewRating": "5"
+            
+        }
     
     def tearDown(self):
         print("Tear Down")
@@ -51,4 +61,15 @@ class EndpointTestCase(TestCase):
         
         response = self.client.delete(f"/spot/{spot_id}")
         print("Test Delete Spot", response.data)
+        self.assertEqual(response.status_code, 200)
+        
+    def test_create_review(self):
+        response = self.client.post("/spot", data=self.spotData)
+        print(response.data)
+        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        print("Test Create Review (Make Spot First)", spot_id)
+        
+        self.reviewData["spotID"] = spot_id
+        response = self.client.post("/review", data=self.reviewData)
+        print(response.data)
         self.assertEqual(response.status_code, 200)

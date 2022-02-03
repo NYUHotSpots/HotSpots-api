@@ -51,9 +51,11 @@ Collections: Spots
 Collections: Reviews
 {
   reviewID,
+  spotID,
   reviewDate,
   reviewTitle,
-  reviewText
+  reviewText, 
+  reviewRating
 }
 
 ### Requirements

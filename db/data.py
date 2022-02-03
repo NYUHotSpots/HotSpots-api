@@ -116,15 +116,17 @@ def update_factors(spot_id, factorAvailability=None,
     return response if response is not None else NOT_FOUND
 
 
-def add_review(spotID, reviewDate, reviewTitle, reviewText):
+def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
     """
     Return a dictionary of created review.
     """
     review_object = {
         "_id": dbc.generate_id(),
+        "spotID": spotID,
         "reviewDate": reviewDate,
         "reviewTitle": reviewTitle,
-        "reviewText": reviewText
+        "reviewText": reviewText,
+        "reviewRating": reviewRating
     }
     print("Create review object", review_object)
     return dbc.create_review(spotID, review_object)

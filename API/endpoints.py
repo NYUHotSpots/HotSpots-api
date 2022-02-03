@@ -24,6 +24,7 @@ reviewParser.add_argument('spotID', type=str, location='form')
 reviewParser.add_argument('reviewDate', type=str, location='form')
 reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
+reviewParser.add_argument('reviewRating', type=int, location='form')
 
 factorParser = reqparse.RequestParser()
 factorParser.add_argument('factorAvailabiliity', type=int, location='form')
@@ -159,9 +160,11 @@ class Review(Resource):
         Creates a new review
         """
         args = reviewParser.parse_args()
-        review_response = db.add_review(args["spotID"], args['reviewDate'],
+        review_response = db.add_review(args["spotID"],
+                                        args['reviewDate'],
                                         args['reviewTitle'],
-                                        args['reviewText'])
+                                        args['reviewText'],
+                                        args['reviewRating'])
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Flavor already exists."))
         else:
