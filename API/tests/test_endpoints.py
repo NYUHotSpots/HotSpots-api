@@ -5,7 +5,6 @@ This file holds the tests for endpoints.py.
 from unittest import TestCase, skip
 from flask_restx import Resource, Api
 
-import datetime
 import API.endpoints as ep
 import db.data as db
 
@@ -23,7 +22,6 @@ class EndpointTestCase(TestCase):
         self.updatedSpotData["spotCapacity"] = "Low"
         self.reviewData = {
             "spotID": "0", 
-            "reviewDate": datetime.datetime.now(), 
             "reviewTitle": "test_endpoints_unit_test", 
             "reviewText": "wow what a great app", 
             "reviewRating": "5"

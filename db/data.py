@@ -1,5 +1,6 @@
 import os
 import db.db_connect as dbc
+import datetime
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -38,6 +39,8 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
         "spotImage": spotImage,
         "spotAddress": spotAddress,
         "spotCapacity": spotCapacity,
+        "spotCreation": str(datetime.datetime.now()),
+        "spotUpdate": str(datetime.datetime.now()),
         "factorAvailability": {
             "factorDate": "",
             "factorValue": 0,
@@ -80,7 +83,8 @@ def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
         "spotName": spotName,
         "spotImage": spotImage,
         "spotAddress": spotAddress,
-        "spotCapacity": spotCapacity
+        "spotCapacity": spotCapacity,
+        "spotUpdate": str(datetime.datetime.now())
     }
     response = dbc.update_spot(spot_id, spot_document)
     if response is None:
@@ -98,14 +102,15 @@ def delete_spot(spot_id):
     return response
 
 
-def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
+def add_review(spotID, reviewTitle, reviewText, reviewRating):
     """
     Return a dictionary of created review.
     """
     review_object = {
         "_id": dbc.generate_id(),
         "spotID": spotID,
-        "reviewDate": reviewDate,
+        "reviewCreation": str(datetime.datetime.now()),
+        "reviewUpdate": str(datetime.datetime.now()),
         "reviewTitle": reviewTitle,
         "reviewText": reviewText,
         "reviewRating": reviewRating

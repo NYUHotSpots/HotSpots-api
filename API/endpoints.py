@@ -21,7 +21,6 @@ spotParser.add_argument('spotCapacity', type=str, location='form')
 
 reviewParser = reqparse.RequestParser()
 reviewParser.add_argument('spotID', type=str, location='form')
-reviewParser.add_argument('reviewDate', type=str, location='form')
 reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 reviewParser.add_argument('reviewRating', type=int, location='form')
@@ -158,7 +157,6 @@ class Review(Resource):
         """
         args = reviewParser.parse_args()
         review_response = db.add_review(args["spotID"],
-                                        args['reviewDate'],
                                         args['reviewTitle'],
                                         args['reviewText'],
                                         args['reviewRating']),
