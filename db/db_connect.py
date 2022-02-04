@@ -176,7 +176,7 @@ def create_review(spotID, review_object):
     spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
     LOG.info("Successfully updated spot" + str(spotID))
     print(spot_update)
-    return spot_update
+    return str(review_object["_id"])
 
     # except pm.errors.KeyNotFound:
     #     LOG.error("Spot does not exist in DB")

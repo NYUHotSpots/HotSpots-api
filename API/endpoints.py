@@ -21,7 +21,6 @@ spotParser.add_argument('spotCapacity', type=str, location='form')
 
 reviewParser = reqparse.RequestParser()
 reviewParser.add_argument('spotID', type=str, location='form')
-reviewParser.add_argument('reviewDate', type=str, location='form')
 reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 reviewParser.add_argument('reviewRating', type=int, location='form')
@@ -168,7 +167,7 @@ class Review(Resource):
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Review already exists."))
         else:
-            return f"{review_response} added."
+            return review_response
 
 
 @api.route('/review/<review_id>')
