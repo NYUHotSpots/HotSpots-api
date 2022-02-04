@@ -7,6 +7,7 @@ import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
 from dotenv import load_dotenv
+from datetime import date, datetime
 
 load_dotenv()
 
@@ -65,9 +66,26 @@ def get_all_spots():
     all_spots_cursor = client[DB_NAME]['spots'].find(
         {}, {"spotName": 1, "spotAddress": 1,
              "spotImage": 1, "factorAvailability": 1})
-    all_spots = [json.loads(json.dumps(doc, default=bsutil.default))
-                 for doc in all_spots_cursor]
-    return all_spots
+    output_spots = []
+    for doc in all_spots_cursor:
+        print(type(doc))
+        today = datetime.today().date()
+        if datetime.strptime(doc["factorAvailability"]["factorDate"], '%Y-%m-%d').date() != today:
+            print("DC Connect, Wrong date")
+            spot_document = {}
+            spot_document["factorAvailability"] = {
+                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+                "factorValue": 0,
+                "factorNumOfInputs": 0
+            }
+            doc["factorAvailability"] = {
+                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+                "factorValue": 0,
+                "factorNumOfInputs": 0
+            }
+            update_spot_factor(doc["_id"], spot_document)
+        output_spots.append(json.loads(json.dumps(doc, default=bsutil.default)))
+    return output_spots
 
 
 def create_spot(spot_document):
@@ -91,6 +109,23 @@ def fetch_spot_details(spot_id):
         print("Fetch", response)
     except pm.errors.KeyNotFound:
         LOG.error("Unable to find flavor with id " + spot_id)
+
+    # print(type(response))
+    
+    today = datetime.today().date()
+    factors = ["factorAvailability", "factorNoiseLevel", "factorTemperature", "factorAmbiance"]
+    for factor in factors:
+        if datetime.strptime(response[factor]["factorDate"], '%Y-%m-%d').date() != today:
+            print("DB Connect, Wrong date for", factor)
+            spot_document = {}
+            newFactor = {
+                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+                "factorValue": 0,
+                "factorNumOfInputs": 0
+            }
+            spot_document[factor] = newFactor
+            response[factor] = newFactor
+            update_spot_factor(response["_id"], spot_document)
     json_response = json.loads(json.dumps(response, default=bsutil.default))
     return json_response
 
@@ -161,3 +196,15 @@ def delete_review(reviewID):
     except pm.errors.KeyNotFound:
         LOG.error("Review does not exist in DB")
         return None
+
+
+def get_spot_factor(spot_id, factorName):
+    query = {"_id": convert_to_object_id(spot_id)}
+    projection = {factorName: 1}
+    return client[DB_NAME]['spots'].find_one(query, projection)[factorName]
+
+
+def update_spot_factor(spot_id, updateFactorDocument):
+    filter = {"_id": convert_to_object_id(spot_id)}
+    new_values = {"$set": updateFactorDocument}
+    return client[DB_NAME]['spots'].update_one(filter, new_values)
