@@ -102,7 +102,7 @@ def update_individual_spot_factor(spot_id, factorName, factorRating):
     
     # if dates are not the same, then new day has begun, need to reset data with current input
     if datetime.strptime(spotFactor["factorDate"], '%Y-%m-%d').date() != today:
-        print("Wrong date")
+        print("Resetting factors with today's data: %s", date )
         spot_document[factorName] = {
             "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": factorRating,

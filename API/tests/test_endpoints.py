@@ -25,7 +25,7 @@ class EndpointTestCase(TestCase):
         self.reviewData = {
             "spotID": "0", 
             "reviewDate": datetime.datetime.now(), 
-            "reviewTile": "test_endpoints_unit_test", 
+            "reviewTitle": "test_endpoints_unit_test", 
             "reviewText": "wow what a great app", 
             "reviewRating": "5"
             
@@ -68,8 +68,15 @@ class EndpointTestCase(TestCase):
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review (Make Spot First)", spot_id)
+        self.assertEqual(response.status_code, 200)
         
         self.reviewData["spotID"] = spot_id
         response = self.client.post("/review", data=self.reviewData)
+        review_id = response.data.decode("utf-8").strip().strip("\"")
+        print("Test Create Review", review_id)
         print(response.data)
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.delete(f"/review/{review_id}")
+        print("Test Delete Review", response.data)
         self.assertEqual(response.status_code, 200)
