@@ -23,12 +23,11 @@ class EndpointTestCase(TestCase):
         self.updatedSpotData = self.spotData
         self.updatedSpotData["spotCapacity"] = "Low"
         self.reviewData = {
-            "spotID": "0", 
+            "spotID": "0",
             "reviewDate": datetime.datetime.now(), 
             "reviewTitle": "test_endpoints_unit_test", 
             "reviewText": "wow what a great app", 
             "reviewRating": "5"
-            
         }
     
     def tearDown(self):
@@ -46,7 +45,6 @@ class EndpointTestCase(TestCase):
         
     def test_create_update_delete_spot(self):
         response = self.client.post("/spot", data=self.spotData)
-        print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)

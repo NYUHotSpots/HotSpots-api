@@ -1,6 +1,7 @@
 from hashlib import new
 import os
 import db.db_connect as dbc
+import datetime
 from dotenv import load_dotenv
 from datetime import date, datetime
 
@@ -41,6 +42,8 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
         "spotImage": spotImage,
         "spotAddress": spotAddress,
         "spotCapacity": spotCapacity,
+        "spotCreation": str(datetime.datetime.now()),
+        "spotUpdate": str(datetime.datetime.now()),
         "factorAvailability": {
             "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
@@ -83,7 +86,8 @@ def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
         "spotName": spotName,
         "spotImage": spotImage,
         "spotAddress": spotAddress,
-        "spotCapacity": spotCapacity
+        "spotCapacity": spotCapacity,
+        "spotUpdate": str(datetime.datetime.now())
     }
     response = dbc.update_spot(spot_id, spot_document)
     if response is None:
@@ -141,7 +145,6 @@ def delete_spot(spot_id):
         return NOT_FOUND
     return response
 
-
 def update_factors(spot_id, factorAvailability=None,
                    factorNoiseLevel=None,
                    factorTemperature=None,
@@ -168,12 +171,16 @@ def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
         "_id": dbc.generate_id(),
         "spotID": spotID,
         "reviewDate": reviewDate,
+        "reviewCreation": str(datetime.datetime.now()),
+        "reviewUpdate": str(datetime.datetime.now()),
         "reviewTitle": reviewTitle,
         "reviewText": reviewText,
         "reviewRating": reviewRating
     }
     print("Create review object", review_object)
-    return dbc.create_review(spotID, review_object)
+    response = dbc.create_review(spotID, review_object)
+    print("Add Review response: ", response)
+    return response
 
 
 def delete_review(reviewID):
