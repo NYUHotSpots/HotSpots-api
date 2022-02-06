@@ -144,24 +144,6 @@ def delete_spot(spot_id):
     return response
 
 
-def update_factors(spot_id, factorAvailability=None,
-                   factorNoiseLevel=None,
-                   factorTemperature=None,
-                   factorAmbiance=None):
-    spot_document = {}
-    if factorAvailability:
-        spot_document["factorAvailability"] = factorAvailability
-    if factorNoiseLevel:
-        spot_document["factorNoiseLevel"] = factorNoiseLevel
-    if factorTemperature:
-        spot_document["factorTemperature"] = factorTemperature
-    if factorAmbiance:
-        spot_document["factorAmbiance"] = factorAmbiance
-
-    response = dbc.update_spot(spot_id, spot_document)
-    return response if response is not None else NOT_FOUND
-
-
 def add_review(spotID, reviewTitle, reviewText, reviewRating):
     """
     Return a dictionary of created review.
