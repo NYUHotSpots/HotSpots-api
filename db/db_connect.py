@@ -62,6 +62,14 @@ def convert_to_object_id(flavor_id):
     return bsutil.ObjectId(flavor_id)
 
 
+def default_factor_form():
+    return {
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+            "factorValue": 0,
+            "factorNumOfInputs": 0
+            }
+
+
 def get_all_spots():
     all_spots_cursor = client[DB_NAME]['spots'].find(
         {}, {"spotName": 1, "spotAddress": 1,
@@ -72,17 +80,8 @@ def get_all_spots():
         factorDate = doc["factorAvailability"]["factorDate"]
         if factorDate != today:
             print("DC Connect, Wrong date")
-            spot_document = {}
-            spot_document["factorAvailability"] = {
-                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-                "factorValue": 0,
-                "factorNumOfInputs": 0
-            }
-            doc["factorAvailability"] = {
-                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-                "factorValue": 0,
-                "factorNumOfInputs": 0
-            }
+            spot_document = {"factorAvailability": default_factor_form()}
+            doc["factorAvailability"] = default_factor_form()
             update_spot_factor(doc["_id"], spot_document)
         json_dump = json.dumps(doc, default=bsutil.default)
         output_spots.append(json.loads(json_dump))
@@ -119,13 +118,8 @@ def fetch_spot_details(spot_id):
         if factorDate != today:
             print("DB Connect, Wrong date for", factor)
             spot_document = {}
-            newFactor = {
-                "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-                "factorValue": 0,
-                "factorNumOfInputs": 0
-            }
-            spot_document[factor] = newFactor
-            response[factor] = newFactor
+            spot_document[factor] = default_factor_form()
+            response[factor] = default_factor_form()
             update_spot_factor(response["_id"], spot_document)
     json_response = json.loads(json.dumps(response, default=bsutil.default))
     return json_response
