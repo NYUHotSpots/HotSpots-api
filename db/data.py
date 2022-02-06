@@ -1,7 +1,9 @@
+from hashlib import new
 import os
 import db.db_connect as dbc
 import datetime
 from dotenv import load_dotenv
+from datetime import date, datetime
 
 load_dotenv()
 
@@ -34,6 +36,7 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
     create a new spot document
     """
     print("Creating new spot document")
+    print("Today is", datetime.today().date().strftime('%Y-%m-%d'))
     spot_document = {
         "spotName": spotName,
         "spotImage": spotImage,
@@ -42,22 +45,22 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
         "spotCreation": str(datetime.datetime.now()),
         "spotUpdate": str(datetime.datetime.now()),
         "factorAvailability": {
-            "factorDate": "",
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
             "factorNumOfInputs": 0
         },
         "factorNoiseLevel": {
-            "factorDate": "",
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
             "factorNumOfInputs": 0
         },
         "factorTemperature": {
-            "factorDate": "",
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
             "factorNumOfInputs": 0
         },
         "factorAmbiance": {
-            "factorDate": "",
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
             "factorNumOfInputs": 0
         },
@@ -92,6 +95,47 @@ def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
     return response
 
 
+def update_individual_spot_factor(spot_id, factorName, factorRating):
+    if not (1 <= factorRating <= 10):
+        return
+    spotFactor = dbc.get_spot_factor(spot_id, factorName)
+    today = datetime.today().date()
+
+    spot_document = {}
+    spot_document["spotUpdate"] = str(datetime.datetime.now())
+    
+    # if dates are not the same, then new day has begun, need to reset data with current input
+    if datetime.strptime(spotFactor["factorDate"], '%Y-%m-%d').date() != today:
+        print("Resetting factors with today's data: %s", date )
+        spot_document[factorName] = {
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+            "factorValue": factorRating,
+            "factorNumOfInputs": 1
+        }
+        dbc.update_spot_factor(spot_id, spot_document)
+    # if day is still going on, need to average out new input
+    else:
+        print("Correct date")
+        # print(datetime.today().date())
+        # print(datetime.strptime(spotFactor["factorDate"], '%Y-%m-%d').date())
+        currentRating = spotFactor["factorValue"]
+        currentCount = spotFactor["factorNumOfInputs"]
+        newCount = currentCount + 1
+        newRating = ((currentRating * currentCount) + factorRating) / newCount # find new average of ratings
+        spot_document[factorName] = {
+            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
+            "factorValue": newRating,
+            "factorNumOfInputs": newCount
+        }
+        dbc.update_spot_factor(spot_id, spot_document)
+
+
+def update_spot_factors(spot_id, factorArgs):
+    for factor in factorArgs:
+        update_individual_spot_factor(spot_id, factor, factorArgs[factor])
+    return spot_id
+
+
 def delete_spot(spot_id):
     """
     Deletes a flavor
@@ -101,14 +145,32 @@ def delete_spot(spot_id):
         return NOT_FOUND
     return response
 
+def update_factors(spot_id, factorAvailability=None,
+                   factorNoiseLevel=None,
+                   factorTemperature=None,
+                   factorAmbiance=None):
+    spot_document = {}
+    if factorAvailability:
+        spot_document["factorAvailability"] = factorAvailability
+    if factorNoiseLevel:
+        spot_document["factorNoiseLevel"] = factorNoiseLevel
+    if factorTemperature:
+        spot_document["factorTemperature"] = factorTemperature
+    if factorAmbiance:
+        spot_document["factorAmbiance"] = factorAmbiance
 
-def add_review(spotID, reviewTitle, reviewText, reviewRating):
+    response = dbc.update_spot(spot_id, spot_document)
+    return response if response is not None else NOT_FOUND
+
+
+def add_review(spotID, reviewDate, reviewTitle, reviewText, reviewRating):
     """
     Return a dictionary of created review.
     """
     review_object = {
         "_id": dbc.generate_id(),
         "spotID": spotID,
+        "reviewDate": reviewDate,
         "reviewCreation": str(datetime.datetime.now()),
         "reviewUpdate": str(datetime.datetime.now()),
         "reviewTitle": reviewTitle,

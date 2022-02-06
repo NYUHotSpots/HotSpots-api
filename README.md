@@ -55,9 +55,11 @@ spots
 Collections: Reviews
 {
   reviewID,
+  spotID,
   reviewDate,
   reviewTitle,
-  reviewText, 
+  reviewText,
+  reviewRating
   reviewCreation, 
   reviewUpdate
 }

@@ -25,8 +25,11 @@ reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 reviewParser.add_argument('reviewRating', type=int, location='form')
 
-factorParser = reqparse.RequestParser()
-factorParser.add_argument('factorRating', type=int, location='form')
+factorParser = reqparse.RequestParser() # each will be a number from 1 to 10
+factorParser.add_argument('factorAvailability', type=int, location='form')
+factorParser.add_argument('factorNoiseLevel', type=int, location='form')
+factorParser.add_argument('factorTemperature', type=int, location='form')
+factorParser.add_argument('factorAmbiance', type=int, location='form')
 
 
 @api.route('/hello')
@@ -86,7 +89,7 @@ class SpotDetail(Resource):
         """
         spot_details = db.get_spot_detail(spot_id)
         if spot_details == db.NOT_FOUND:
-            raise (wz.NotFound("Flavor detail not found."))
+            raise (wz.NotFound("Spot detail not found."))
         else:
             return spot_details
 
@@ -106,12 +109,12 @@ class SpotDetail(Resource):
                                        args['spotCapacity'],
                                        args['spotImage'])
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Flavor not found."))
+            raise (wz.NotFound("Spot not found."))
         else:
             return f"{spot_response} added."
 
     """
-    This endpoint deletes a new flavor
+    This endpoint deletes a new spot
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
@@ -126,8 +129,8 @@ class SpotDetail(Resource):
             return f"{spot_response} deleted."
 
 
-@api.route('/spot/availability/<spot_id>')
-class SpotUpdateDetail(Resource):
+@api.route('/spot/factor/<spot_id>')
+class SpotUpdateFactor(Resource):
     """
     This endpoint updates a spot
     """
@@ -136,14 +139,14 @@ class SpotUpdateDetail(Resource):
     @api.doc(parser=factorParser)
     def put(self, spot_id):
         """
-        Update a spot availability
+        Update a spot factor
         """
         args = factorParser.parse_args()
-        spot_response = db.update_spot(spot_id, args['factorRating'],)
+        spot_response = db.update_spot_factors(spot_id, args)
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Flavor not found."))
+            raise (wz.NotFound("Spot not found."))
         else:
-            return f"{spot_response} added."
+            return f"{spot_response} factor updated."
 
 
 @api.route('/review')
@@ -157,11 +160,12 @@ class Review(Resource):
         """
         args = reviewParser.parse_args()
         review_response = db.add_review(args["spotID"],
+                                        args['reviewDate'],
                                         args['reviewTitle'],
                                         args['reviewText'],
-                                        args['reviewRating']),
+                                        args['reviewRating'])
         if review_response == db.DUPLICATE:
-            raise (wz.NotAcceptable("Flavor already exists."))
+            raise (wz.NotAcceptable("Review already exists."))
         else:
             return review_response
 
