@@ -68,7 +68,6 @@ def get_all_spots():
              "spotImage": 1, "factorAvailability": 1})
     output_spots = []
     for doc in all_spots_cursor:
-        print(type(doc))
         today = datetime.today().date().strftime('%Y-%m-%d')
         factorDate = doc["factorAvailability"]["factorDate"]
         if factorDate != today:
@@ -180,13 +179,6 @@ def create_review(spotID, review_object):
     print(spot_update)
     return str(review_object["_id"])
 
-    # except pm.errors.KeyNotFound:
-    #     LOG.error("Spot does not exist in DB")
-    #     return None
-    # except pm.errors.UpdateOperationFailed:
-    #     LOG.error("Error occurred while updating DB, try again later")
-    #     return None
-
 
 def delete_review(reviewID):
     filter = {"_id": convert_to_object_id(reviewID)}
@@ -198,6 +190,15 @@ def delete_review(reviewID):
     except pm.errors.KeyNotFound:
         LOG.error("Review does not exist in DB")
         return None
+
+
+def get_review_by_spot(spot_id):
+    review_cursor = client[DB_NAME]['reviews'].find({"spotID": spot_id})
+    reviews = []
+    for review in review_cursor:
+        json_dump = json.dumps(review, default=bsutil.default)
+        reviews.append(json.loads(json_dump))
+    return reviews
 
 
 def get_spot_factor(spot_id, factorName):

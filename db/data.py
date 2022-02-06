@@ -189,3 +189,11 @@ def delete_review(reviewID):
     if response is None:
         return NOT_FOUND
     return response
+
+
+def get_review_by_spot(spot_id):
+    """
+    Get review by spot id
+    """
+    response = dbc.get_review_by_spot(spot_id)
+    return response if response is not None else NOT_FOUND

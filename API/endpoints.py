@@ -183,3 +183,18 @@ class ReviewDetail(Resource):
             raise (wz.NotFound("Review not found."))
         else:
             return f"{review_response} deleted."
+
+
+@api.route('/review/<spot_id>')
+class ReviewSpot(Resource):
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    def get(self, spot_id):
+        """
+        Get review for specific spot
+        """
+        spot_review_response = db.get_review_by_spot(str(spot_id))
+        if spot_review_response == db.NOT_FOUND:
+            raise (wz.NotFound("Reviews for spot %s not found.", spot_id))
+        else:
+            return spot_review_response
