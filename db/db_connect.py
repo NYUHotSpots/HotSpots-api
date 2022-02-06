@@ -7,7 +7,7 @@ import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
 from dotenv import load_dotenv
-from datetime import date, datetime
+from datetime import datetime
 
 load_dotenv()
 
@@ -69,8 +69,9 @@ def get_all_spots():
     output_spots = []
     for doc in all_spots_cursor:
         print(type(doc))
-        today = datetime.today().date()
-        if datetime.strptime(doc["factorAvailability"]["factorDate"], '%Y-%m-%d').date() != today:
+        today = datetime.today().date().strftime('%Y-%m-%d')
+        factorDate = doc["factorAvailability"]["factorDate"]
+        if factorDate != today:
             print("DC Connect, Wrong date")
             spot_document = {}
             spot_document["factorAvailability"] = {
@@ -84,7 +85,8 @@ def get_all_spots():
                 "factorNumOfInputs": 0
             }
             update_spot_factor(doc["_id"], spot_document)
-        output_spots.append(json.loads(json.dumps(doc, default=bsutil.default)))
+        json_dump = json.dumps(doc, default=bsutil.default)
+        output_spots.append(json.loads(json_dump))
     return output_spots
 
 
@@ -110,12 +112,12 @@ def fetch_spot_details(spot_id):
     except pm.errors.KeyNotFound:
         LOG.error("Unable to find flavor with id " + spot_id)
 
-    # print(type(response))
-    
-    today = datetime.today().date()
-    factors = ["factorAvailability", "factorNoiseLevel", "factorTemperature", "factorAmbiance"]
+    today = datetime.today().date().strftime('%Y-%m-%d')
+    factors = ["factorAvailability", "factorNoiseLevel",
+               "factorTemperature", "factorAmbiance"]
     for factor in factors:
-        if datetime.strptime(response[factor]["factorDate"], '%Y-%m-%d').date() != today:
+        factorDate = response[factor]["factorDate"]
+        if factorDate != today:
             print("DB Connect, Wrong date for", factor)
             spot_document = {}
             newFactor = {

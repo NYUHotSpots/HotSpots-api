@@ -25,7 +25,8 @@ reviewParser.add_argument('reviewTitle', type=str, location='form')
 reviewParser.add_argument('reviewText', type=str, location='form')
 reviewParser.add_argument('reviewRating', type=int, location='form')
 
-factorParser = reqparse.RequestParser() # each will be a number from 1 to 10
+# each will be a number from 1 to 10
+factorParser = reqparse.RequestParser()
 factorParser.add_argument('factorAvailability', type=int, location='form')
 factorParser.add_argument('factorNoiseLevel', type=int, location='form')
 factorParser.add_argument('factorTemperature', type=int, location='form')
@@ -160,7 +161,6 @@ class Review(Resource):
         """
         args = reviewParser.parse_args()
         review_response = db.add_review(args["spotID"],
-                                        args['reviewDate'],
                                         args['reviewTitle'],
                                         args['reviewText'],
                                         args['reviewRating'])
