@@ -12,12 +12,12 @@ class DBTestCase(TestCase):
     def tearDown(self):
         pass
 
-    def test_get_flavors(self):
+    def test_get_spots(self):
         """
         Tests the database to see if we can get spots
         """
         spots = db.get_spots()
-        self.assertIsInstance(spots, dict)
+        self.assertIsInstance(spots, list)
 
     def test_get_review(self):
         """
