@@ -85,7 +85,7 @@ def get_all_spots():
             update_spot_factor(doc["_id"], spot_document)
         json_dump = json.dumps(doc, default=bsutil.default)
         output_spots.append(json.loads(json_dump))
-    return output_spots
+    return json.dumps(output_spots)
 
 
 def create_spot(spot_document):
@@ -192,7 +192,7 @@ def get_review_by_spot(spot_id):
     for review in review_cursor:
         json_dump = json.dumps(review, default=bsutil.default)
         reviews.append(json.loads(json_dump))
-    return reviews
+    return json.dumps(reviews)
 
 
 def get_spot_factor(spot_id, factorName):

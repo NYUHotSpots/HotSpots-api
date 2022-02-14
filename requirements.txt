@@ -1,6 +1,9 @@
 flask
 flask-restx
+flask-cors
 gunicorn
 werkzeug
 pymongo[srv]
 python-dotenv
+python-jose
+six
