@@ -86,3 +86,7 @@ class EndpointTestCase(TestCase):
         response = self.client.delete(f"/review/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
         self.assertEqual(response.status_code, 200)
+
+    def test_unauthorized(self):
+        response = self.client.post("/spot", data=self.spotData)
+        self.assertEqual(response.status_code, 401)
