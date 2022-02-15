@@ -7,8 +7,12 @@ from urllib import response
 from flask_restx import Resource, Api
 
 import datetime
+import os
 import API.endpoints as ep
 import db.data as db
+
+BEARER_TEST_TOKEN = os.environ.get("BEARER_TEST_TOKEN")
+bearer = f"Bearer {BEARER_TEST_TOKEN}"
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -28,6 +32,7 @@ class EndpointTestCase(TestCase):
             "reviewText": "wow what a great app", 
             "reviewRating": "5"
         }
+        self.headers = {"authorization": bearer}
     
     def tearDown(self):
         print("Tear Down")
@@ -38,46 +43,46 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_get_all_spots(self):
-        response = self.client.get("/spot")
+        response = self.client.get("/spot", headers=self.headers)
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
     def test_create_update_delete_spot(self):
-        response = self.client.post("/spot", data=self.spotData)
+        response = self.client.post("/spot", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.get(f"/spot/{spot_id}")
+        response = self.client.get(f"/spot/{spot_id}", headers=self.headers)
         print("Test Get Spot", response.data)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.put(f"/spot/{spot_id}", data=self.updatedSpotData)
+        response = self.client.put(f"/spot/{spot_id}", data=self.updatedSpotData, headers=self.headers)
         print("Test Update Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.delete(f"/spot/{spot_id}")
+        response = self.client.delete(f"/spot/{spot_id}", headers=self.headers)
         print("Test Delete Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
     def test_create_review(self):
-        response = self.client.post("/spot", data=self.spotData)
+        response = self.client.post("/spot", data=self.spotData, headers=self.headers)
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
         
         self.reviewData["spotID"] = spot_id
-        response = self.client.post("/review", data=self.reviewData)
+        response = self.client.post("/review", data=self.reviewData, headers=self.headers)
         review_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review", review_id)
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.get(f"/review/{spot_id}")
+        response = self.client.get(f"/review/{spot_id}", headers=self.headers)
         print("Test Get Review", response.data)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.delete(f"/review/{review_id}")
+        response = self.client.delete(f"/review/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
         self.assertEqual(response.status_code, 200)
