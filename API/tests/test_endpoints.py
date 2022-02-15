@@ -2,14 +2,10 @@
 This file holds the tests for endpoints.py.
 """
 
-from unittest import TestCase, skip
-from urllib import response 
-from flask_restx import Resource, Api
+from unittest import TestCase
 
-import datetime
 import os
 import API.endpoints as ep
-import db.data as db
 
 BEARER_TEST_TOKEN = os.environ.get("BEARER_TEST_TOKEN")
 bearer = f"Bearer {BEARER_TEST_TOKEN}"
