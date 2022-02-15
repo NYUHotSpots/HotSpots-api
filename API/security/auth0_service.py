@@ -2,7 +2,7 @@ from http import HTTPStatus
 
 import jwt
 
-from security.utils import json_abort, audience, domain
+from API.security.utils import json_abort, audience, domain
 
 
 class Auth0Service:

@@ -9,7 +9,7 @@ from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
 import db.data as db
-from security.guards import authorization_guard
+from API.security.guards import authorization_guard
 
 app = Flask(__name__)
 api = Api(app)

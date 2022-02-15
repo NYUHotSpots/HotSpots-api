@@ -4,8 +4,8 @@ from types import SimpleNamespace
 
 from flask import request, g
 
-from security.auth0_service import auth0_service
-from security.utils import json_abort
+from API.security.auth0_service import auth0_service
+from API.security.utils import json_abort
 
 unauthorized_error = {
     "message": "Requires authentication"
