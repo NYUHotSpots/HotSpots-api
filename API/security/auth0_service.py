@@ -22,7 +22,6 @@ class Auth0Service:
     def get_signing_key(self, token):
         try:
             jwks_client = jwt.PyJWKClient(self.jwks_uri)
-
             return jwks_client.get_signing_key_from_jwt(token).key
         except Exception as error:
             json_abort(HTTPStatus.INTERNAL_SERVER_ERROR, {
@@ -33,10 +32,8 @@ class Auth0Service:
 
     def validate_jwt(self, token):
         try:
-            print("token1")
-            print(token)
             jwt_signing_key = self.get_signing_key(token)
-
+            
             payload = jwt.decode(
                 token,
                 jwt_signing_key,

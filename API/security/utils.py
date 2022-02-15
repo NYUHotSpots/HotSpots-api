@@ -1,5 +1,8 @@
 from flask import jsonify, abort
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
 def json_abort(status_code, data=None):
