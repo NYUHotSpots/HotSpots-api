@@ -1,5 +1,4 @@
-from flask import jsonify, abort, Response
-from json import dumps
+from flask import abort
 import os
 from dotenv import load_dotenv
 
