@@ -4,11 +4,10 @@ This file holds the tests for endpoints.py.
 
 from unittest import TestCase
 
-import os
 import API.endpoints as ep
+from API.security.utils import get_auth0_token
 
-BEARER_TEST_TOKEN = os.environ.get("BEARER_TEST_TOKEN")
-bearer = f"Bearer {BEARER_TEST_TOKEN}"
+bearer = "Bearer " + get_auth0_token()
 
 class EndpointTestCase(TestCase):
     def setUp(self):
