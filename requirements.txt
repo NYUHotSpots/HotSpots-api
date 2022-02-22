@@ -5,3 +5,9 @@ gunicorn
 werkzeug
 pymongo[srv]
 python-dotenv
+python-jose
+six
+PyJWT
+pyjwt[crypto]
+flask_talisman
+Flask-Cors

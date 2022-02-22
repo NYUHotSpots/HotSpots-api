@@ -10,6 +10,7 @@ from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
 import db.data as db
+from API.security.guards import authorization_guard
 
 app = Flask(__name__)
 CORS(app)
@@ -66,6 +67,7 @@ class Spot(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser)
+    @authorization_guard
     def post(self):
         """
         Creates a new spot
@@ -102,6 +104,7 @@ class SpotDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=spotParser)
+    @authorization_guard
     def put(self, spot_id):
         """
         Update a spot
@@ -121,6 +124,7 @@ class SpotDetail(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @authorization_guard
     def delete(self, spot_id):
         """
         Delete a spot
@@ -140,6 +144,7 @@ class SpotUpdateFactor(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=factorParser)
+    @authorization_guard
     def put(self, spot_id):
         """
         Update a spot factor
@@ -157,6 +162,7 @@ class Review(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=reviewParser)
+    @authorization_guard
     def post(self):
         """
         Creates a new review
@@ -176,6 +182,7 @@ class Review(Resource):
 class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @authorization_guard
     def delete(self, review_id):
         """
         Deletes a new review
