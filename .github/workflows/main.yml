@@ -45,10 +45,10 @@ jobs:
           MONGO_DEV: ${{ secrets.MONGO_DEV }}
           MONGO_PROD: ${{ secrets.MONGO_PROD }}
           AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
-          AUTH0_API_AUDIENCE: ${{ secrets.AUTH0_API_AUDIENCE }}
+          AUTH0_API_AUDIENCE: https://nyuhotspots.github.io/HotSpots-ui
           CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
-          CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          CLIENT_ID: MYx5uW9m6PtUuysJYUdsABvdqAQWryW4
+          CLIENT_SECRET: DSO3ynGQlz7cS1bPko1rfQe7Yrj4EsyKy_uqzFfKLMXom0IIa65rke0uJvHHOBOB
           AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
         run: |
           echo "Hello from main.yml file"
