@@ -20,6 +20,7 @@ def json_abort(status_code, message=None):
 
 
 def get_auth0_token():
+    print("GET AUTH0 TOKEN")
     conn = http.client.HTTPSConnection("hotspots-dev.us.auth0.com")
     payload = json.dumps({
         "client_id" : client_id, 
@@ -27,10 +28,12 @@ def get_auth0_token():
         "audience": audience,
         "grant_type": "client_credentials"
     })
+    print(payload)
     headers = { 'content-type': "application/json" }
     conn.request("POST", "/oauth/token", payload, headers)
 
     res = conn.getresponse()
+    print(res)
     access_token = json.loads(res.read())["access_token"]
     print("New access token: " + access_token)
     return access_token
