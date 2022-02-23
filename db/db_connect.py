@@ -71,6 +71,11 @@ def default_factor_form():
             }
 
 
+def check_document_exist(object_field, field_value, collection):
+    review_cursor = client[DB_NAME][collection].count_documents({object_field: field_value})  # noqa 
+    return True if review_cursor > 0 else False
+
+
 def get_all_spots():
     all_spots_cursor = client[DB_NAME]['spots'].find(
         {}, {"spotName": 1, "spotAddress": 1,
@@ -152,6 +157,9 @@ def delete_spot(spot_id):
     """
     LOG.info("Attempting spot deletion")
     try:
+        spot_id = convert_to_object_id(spot_id)
+        if not (check_document_exist("_id", spot_id, "spots")):
+            return None
         filter = {"_id": convert_to_object_id(spot_id)}
         spot_deletion = client[DB_NAME]['spots'].delete_one(filter)
         LOG.info("Successfully deleted spot " + str(spot_id))
@@ -178,6 +186,9 @@ def create_review(spotID, review_object):
 def delete_review(reviewID):
     LOG.info("Attempting review deletion")
     try:
+        reviewID = convert_to_object_id(reviewID)
+        if not (check_document_exist("_id", reviewID, "reviews")):
+            return None
         filter = {"_id": convert_to_object_id(reviewID)}
         review_deletion = client[DB_NAME]['reviews'].delete_one(filter)
         LOG.info("Successfully deleted review " + str(reviewID))

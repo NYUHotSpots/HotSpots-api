@@ -28,6 +28,7 @@ class EndpointTestCase(TestCase):
             "reviewRating": "5"
         }
         self.headers = {"authorization": bearer}
+        self.bad_id = "000000000000000000000000"
     
     def tearDown(self):
         print("Tear Down")
@@ -91,8 +92,20 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 400)
 
     def test_bad_deletes(self):
+        '''
+        This tests poorly formatted IDs (raises bson InvalidId error) 
+        and IDs that aren't found in the DB 
+        (if you call delete and that doc isn't found, 
+        then mongo will just pretend like it did delete it without raising any error)
+        '''
         response = self.client.delete(f"/review/1234", headers=self.headers)
         self.assertEqual(response.status_code, 404)
         
+        response = self.client.delete(f"/review/{self.bad_id}", headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        
         response = self.client.delete(f"/spot/1234", headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        
+        response = self.client.delete(f"/spot/{self.bad_id}", headers=self.headers)
         self.assertEqual(response.status_code, 404)
