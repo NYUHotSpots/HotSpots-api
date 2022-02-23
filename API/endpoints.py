@@ -12,7 +12,16 @@ import db.data as db
 from API.security.guards import authorization_guard
 
 app = Flask(__name__)
-api = Api(app)
+
+authorizations = {
+    'bearerAuth': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
+        'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
+    }
+}
+api = Api(app, authorizations=authorizations)
 
 spotParser = reqparse.RequestParser()
 spotParser.add_argument('spotName', type=str, location='form')
@@ -68,6 +77,7 @@ class SpotCreate(Resource):
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser)
     @authorization_guard
+    @api.doc(security='bearerAuth')
     def post(self):
         """
         Creates a new spot
@@ -98,7 +108,7 @@ class SpotDetail(Resource):
         else:
             return spot_details
 
-@api.route('/spot/update')
+@api.route('/spot/update/<spot_id>')
 class SpotUpdate(Resource):
     """
     This endpoint updates a spot
@@ -121,7 +131,7 @@ class SpotUpdate(Resource):
         else:
             return f"{spot_response} added."
 
-@api.route('/spot/delete')
+@api.route('/spot/delete/<spot_id>')
 class SpotDelete(Resource):
     """
     This endpoint deletes a new spot
