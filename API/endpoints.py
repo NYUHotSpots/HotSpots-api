@@ -13,6 +13,7 @@ import db.data as db
 from API.security.guards import authorization_guard
 
 app = Flask(__name__)
+app.config['ERROR_404_HELP'] = False
 CORS(app)
 api = Api(app)
 
@@ -94,7 +95,7 @@ class SpotDetail(Resource):
         """
         spot_details = db.get_spot_detail(spot_id)
         if spot_details == db.NOT_FOUND:
-            raise (wz.NotFound("Spot detail not found."))
+            raise (wz.NotFound(f"Spot {spot_id} detail not found."))
         else:
             return spot_details
 
@@ -115,7 +116,7 @@ class SpotDetail(Resource):
                                        args['spotCapacity'],
                                        args['spotImage'])
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} added."
 
@@ -131,7 +132,7 @@ class SpotDetail(Resource):
         """
         spot_response = db.delete_spot(spot_id)
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} deleted."
 
@@ -152,7 +153,7 @@ class SpotUpdateFactor(Resource):
         args = factorParser.parse_args()
         spot_response = db.update_spot_factors(spot_id, args)
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} factor updated."
 
@@ -183,14 +184,14 @@ class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
-    @authorization_guard
+    # @authorization_guard
     def delete(self, review_id):
         """
         Deletes a new review
         """
         review_response = db.delete_review(review_id)
         if review_response == db.NOT_FOUND:
-            raise (wz.NotFound("Review not found."))
+            raise (wz.NotFound(f"Review {review_id} not found."))
         else:
             return f"{review_response} deleted."
 
@@ -205,6 +206,6 @@ class ReviewSpot(Resource):
         """
         spot_review_response = db.get_review_by_spot(str(spot_id))
         if spot_review_response == db.NOT_FOUND:
-            raise (wz.NotFound("Reviews for spot %s not found.", spot_id))
+            raise (wz.NotFound(f"Reviews for spot {spot_id} not found."))
         else:
             return spot_review_response
