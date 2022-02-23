@@ -6,6 +6,7 @@ import json
 import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
+from bson.errors import InvalidId
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -149,13 +150,13 @@ def delete_spot(spot_id):
     """
     Delete spot from database
     """
-    filter = {"_id": convert_to_object_id(spot_id)}
     LOG.info("Attempting spot deletion")
     try:
+        filter = {"_id": convert_to_object_id(spot_id)}
         spot_deletion = client[DB_NAME]['spots'].delete_one(filter)
         LOG.info("Successfully deleted spot " + str(spot_id))
         return spot_deletion
-    except pm.errors.KeyNotFound:
+    except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Spot does not exist in DB")
         return None
 
@@ -175,14 +176,14 @@ def create_review(spotID, review_object):
 
 
 def delete_review(reviewID):
-    filter = {"_id": convert_to_object_id(reviewID)}
     LOG.info("Attempting review deletion")
     try:
+        filter = {"_id": convert_to_object_id(reviewID)}
         review_deletion = client[DB_NAME]['reviews'].delete_one(filter)
         LOG.info("Successfully deleted review " + str(reviewID))
         return review_deletion
-    except pm.errors.KeyNotFound:
-        LOG.error("Review does not exist in DB")
+    except (pm.errors.CursorNotFound, InvalidId):
+        LOG.info("Review does not exist in DB")
         return None
 
 

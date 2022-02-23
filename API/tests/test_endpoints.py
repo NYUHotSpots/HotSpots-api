@@ -89,3 +89,10 @@ class EndpointTestCase(TestCase):
         bad_header = {"authorization" : "Bearer "}
         response = self.client.post("/spot", data=self.spotData, headers=bad_header)
         self.assertEqual(response.status_code, 400)
+
+    def test_bad_deletes(self):
+        response = self.client.delete(f"/review/1234", headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+        
+        response = self.client.delete(f"/spot/1234", headers=self.headers)
+        self.assertEqual(response.status_code, 404)

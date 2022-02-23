@@ -182,6 +182,7 @@ class Review(Resource):
 class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
     @authorization_guard
     def delete(self, review_id):
         """
