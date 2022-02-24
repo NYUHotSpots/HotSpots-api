@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask
+from flask import Flask, request
 from flask_cors import CORS
 from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
@@ -31,10 +31,10 @@ reviewParser.add_argument('reviewRating', type=int, location='form')
 
 # each will be a number from 1 to 10
 factorParser = reqparse.RequestParser()
-factorParser.add_argument('factorAvailability', type=int, location='form')
-factorParser.add_argument('factorNoiseLevel', type=int, location='form')
-factorParser.add_argument('factorTemperature', type=int, location='form')
-factorParser.add_argument('factorAmbiance', type=int, location='form')
+factorParser.add_argument('factorAvailability', type=dict, location='form')
+factorParser.add_argument('factorNoiseLevel', type=dict, location='form')
+factorParser.add_argument('factorTemperature', type=dict, location='form')
+factorParser.add_argument('factorAmbiance', type=dict, location='form')
 
 
 @api.route('/hello')
@@ -150,7 +150,7 @@ class SpotUpdateFactor(Resource):
         """
         Update a spot factor
         """
-        args = factorParser.parse_args()
+        args = request.get_json(force=True)
         spot_response = db.update_spot_factors(spot_id, args)
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Spot {spot_id} not found."))
@@ -175,6 +175,9 @@ class Review(Resource):
                                         args['reviewRating'])
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Review already exists."))
+        elif review_response == db.NOT_FOUND:
+            spotID = args["spotID"]
+            raise (wz.NotFound(f"Spot {spotID} doesn't exist"))
         else:
             return review_response
 
@@ -184,7 +187,7 @@ class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
-    @authorization_guard
+    # @authorization_guard
     def delete(self, review_id):
         """
         Deletes a new review
