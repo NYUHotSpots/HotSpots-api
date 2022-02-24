@@ -30,7 +30,7 @@ def get_auth0_token():
     headers = { 'content-type': "application/json" }
     conn.request("POST", "/oauth/token", payload, headers)
 
-    res = conn.getresponse()
-    access_token = json.loads(res.read())["access_token"]
+    res = conn.getresponse().read()
+    access_token = json.loads(res)["access_token"]
     print("New access token: " + access_token)
     return access_token

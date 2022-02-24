@@ -44,6 +44,12 @@ jobs:
           MONGO_PASSWORD: ${{ secrets.MONGO_PASSWORD }}
           MONGO_DEV: ${{ secrets.MONGO_DEV }}
           MONGO_PROD: ${{ secrets.MONGO_PROD }}
+          AUTH0_DOMAIN: ${{ secrets.AUTH0_DOMAIN }}
+          AUTH0_API_AUDIENCE: https://nyuhotspots.github.io/HotSpots-ui
+          CLIENT_ORIGIN_URL: ${{ secrets.CLIENT_ORIGIN_URL }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
         run: |
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD

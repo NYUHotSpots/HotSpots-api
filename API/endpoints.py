@@ -5,6 +5,7 @@ The endpoint called `endpoints` will return all available endpoints.
 
 from http import HTTPStatus
 from flask import Flask
+from flask_cors import CORS
 from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
@@ -21,6 +22,9 @@ authorizations = {
         'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
     }
 }
+
+app.config['ERROR_404_HELP'] = False
+CORS(app)
 api = Api(app, authorizations=authorizations)
 
 spotParser = reqparse.RequestParser()
@@ -104,7 +108,7 @@ class SpotDetail(Resource):
         """
         spot_details = db.get_spot_detail(spot_id)
         if spot_details == db.NOT_FOUND:
-            raise (wz.NotFound("Spot detail not found."))
+            raise (wz.NotFound(f"Spot {spot_id} detail not found."))
         else:
             return spot_details
 
@@ -127,7 +131,7 @@ class SpotUpdate(Resource):
                                        args['spotCapacity'],
                                        args['spotImage'])
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} added."
 
@@ -145,7 +149,7 @@ class SpotDelete(Resource):
         """
         spot_response = db.delete_spot(spot_id)
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} deleted."
 
@@ -166,7 +170,7 @@ class SpotUpdateFactor(Resource):
         args = factorParser.parse_args()
         spot_response = db.update_spot_factors(spot_id, args)
         if spot_response == db.NOT_FOUND:
-            raise (wz.NotFound("Spot not found."))
+            raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} factor updated."
 
@@ -196,6 +200,7 @@ class ReviewCreate(Resource):
 class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
+    @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
     @authorization_guard
     def delete(self, review_id):
         """
@@ -203,7 +208,7 @@ class ReviewDetail(Resource):
         """
         review_response = db.delete_review(review_id)
         if review_response == db.NOT_FOUND:
-            raise (wz.NotFound("Review not found."))
+            raise (wz.NotFound(f"Review {review_id} not found."))
         else:
             return f"{review_response} deleted."
 
@@ -218,6 +223,6 @@ class ReviewSpot(Resource):
         """
         spot_review_response = db.get_review_by_spot(str(spot_id))
         if spot_review_response == db.NOT_FOUND:
-            raise (wz.NotFound("Reviews for spot %s not found.", spot_id))
+            raise (wz.NotFound(f"Reviews for spot {spot_id} not found."))
         else:
             return spot_review_response
