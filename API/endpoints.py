@@ -13,9 +13,19 @@ import db.data as db
 from API.security.guards import authorization_guard
 
 app = Flask(__name__)
+
+authorizations = {
+    'bearerAuth': {
+        'type': 'apiKey',
+        'in': 'header',
+        'name': 'Authorization',
+        'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
+    }
+}
+
 app.config['ERROR_404_HELP'] = False
 CORS(app)
-api = Api(app)
+api = Api(app, authorizations=authorizations)
 
 spotParser = reqparse.RequestParser()
 spotParser.add_argument('spotName', type=str, location='form')
@@ -51,8 +61,8 @@ class HelloWorld(Resource):
         return {"Hola": "Mundo"}
 
 
-@api.route('/spot')
-class Spot(Resource):
+@api.route('/spot/list')
+class SpotList(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     def get(self):
@@ -65,10 +75,13 @@ class Spot(Resource):
         else:
             return spots
 
+@api.route('/spot/create')
+class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser)
     @authorization_guard
+    @api.doc(security='bearerAuth')
     def post(self):
         """
         Creates a new spot
@@ -99,6 +112,8 @@ class SpotDetail(Resource):
         else:
             return spot_details
 
+@api.route('/spot/update/<spot_id>')
+class SpotUpdate(Resource):
     """
     This endpoint updates a spot
     """
@@ -120,6 +135,8 @@ class SpotDetail(Resource):
         else:
             return f"{spot_response} added."
 
+@api.route('/spot/delete/<spot_id>')
+class SpotDelete(Resource):
     """
     This endpoint deletes a new spot
     """
@@ -137,7 +154,7 @@ class SpotDetail(Resource):
             return f"{spot_response} deleted."
 
 
-@api.route('/spot/factor/<spot_id>')
+@api.route('/factor/update/<spot_id>')
 class SpotUpdateFactor(Resource):
     """
     This endpoint updates a spot
@@ -158,8 +175,8 @@ class SpotUpdateFactor(Resource):
             return f"{spot_response} factor updated."
 
 
-@api.route('/review')
-class Review(Resource):
+@api.route('/review/create')
+class ReviewCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=reviewParser)
@@ -179,7 +196,7 @@ class Review(Resource):
             return review_response
 
 
-@api.route('/review/<review_id>')
+@api.route('/review/delete/<review_id>')
 class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -196,7 +213,7 @@ class ReviewDetail(Resource):
             return f"{review_response} deleted."
 
 
-@api.route('/review/<spot_id>')
+@api.route('/review/read/<spot_id>')
 class ReviewSpot(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
