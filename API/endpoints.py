@@ -19,7 +19,8 @@ authorizations = {
         'type': 'apiKey',
         'in': 'header',
         'name': 'Authorization',
-        'description': "Type in the *'Value'* input box below: **'Bearer &lt;JWT&gt;'**, where JWT is the token"
+        'description': "Type in the *'Value'* input box below: \
+            **'Bearer &lt;JWT&gt;'**, where JWT is the token"
     }
 }
 
@@ -75,6 +76,7 @@ class SpotList(Resource):
         else:
             return spots
 
+
 @api.route('/spot/create')
 class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
@@ -112,6 +114,7 @@ class SpotDetail(Resource):
         else:
             return spot_details
 
+
 @api.route('/spot/update/<spot_id>')
 class SpotUpdate(Resource):
     """
@@ -134,6 +137,7 @@ class SpotUpdate(Resource):
             raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
             return f"{spot_response} added."
+
 
 @api.route('/spot/delete/<spot_id>')
 class SpotDelete(Resource):
