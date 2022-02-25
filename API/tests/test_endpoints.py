@@ -53,7 +53,7 @@ class EndpointTestCase(TestCase):
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
-    def test_create_update_delete_spot(self):
+    def test_spot_crud(self):
         response = self.client.post("/spot/create", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Spot", spot_id)
@@ -71,7 +71,7 @@ class EndpointTestCase(TestCase):
         print("Test Delete Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
-    def test_create_review(self):
+    def test_review_crud(self):
         response = self.client.post("/spot/create", data=self.spotData, headers=self.headers)
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
