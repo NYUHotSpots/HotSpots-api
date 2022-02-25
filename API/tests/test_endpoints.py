@@ -3,7 +3,6 @@ This file holds the tests for endpoints.py.
 """
 
 from unittest import TestCase
-
 import API.endpoints as ep
 from API.security.utils import get_auth0_token
 
@@ -29,6 +28,17 @@ class EndpointTestCase(TestCase):
         }
         self.headers = {"authorization": bearer}
         self.bad_id = "000000000000000000000000"
+        self.factor_form = {                
+            "factorDate": "2022-02-23",
+            "factorValue": "4",
+            "factorNumOfInputs": "1"
+        }
+        self.factor = {
+            "factorAvailability": self.factor_form,
+            "factorNoiseLevel": self.factor_form,
+            "factorTemperature": self.factor_form,
+            "factorAmbiance": self.factor_form
+        }
     
     def tearDown(self):
         print("Tear Down")
@@ -43,14 +53,14 @@ class EndpointTestCase(TestCase):
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
-    def test_create_update_delete_spot(self):
+    def test_spot_crud(self):
         response = self.client.post("/spot/create", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)
         
         response = self.client.get(f"/spot/{spot_id}", headers=self.headers)
-        print("Test Get Spot", response.data)
+        print("Test Get Spot Detail", response.data)
         self.assertEqual(response.status_code, 200)
 
         response = self.client.put(f"/spot/update/{spot_id}", data=self.updatedSpotData, headers=self.headers)
@@ -61,7 +71,7 @@ class EndpointTestCase(TestCase):
         print("Test Delete Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
-    def test_create_review(self):
+    def test_review_crud(self):
         response = self.client.post("/spot/create", data=self.spotData, headers=self.headers)
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
@@ -81,6 +91,14 @@ class EndpointTestCase(TestCase):
 
         response = self.client.delete(f"/review/delete/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
+        self.assertEqual(response.status_code, 200)
+        
+    def test_factor_crud(self):
+        response = self.client.post("/spot/create", data=self.spotData, headers=self.headers)
+        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.put(f"/factor/update/{spot_id}", json=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
     def test_unauthorized_bad_requests(self):
@@ -108,4 +126,32 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
         
         response = self.client.delete(f"/spot/delete/{self.bad_id}", headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+
+    def test_bad_put(self): 
+        response = self.client.put(f"/spot/update/{self.bad_id}", data=self.updatedSpotData, headers=self.headers)
+        print("Test Bad Spot Put")
+        self.assertEqual(response.status_code, 404)
+        
+        response = self.client.get(f"/spot/{self.bad_id}", headers=self.headers)
+        # make sure it wasn't created
+        self.assertEqual(response.status_code, 404)
+
+        print("Test Bad Factor Put")
+        response = self.client.put(f"/spot/factor/update/{self.bad_id}", json=self.factor, headers=self.headers)
+        self.assertEqual(response.status_code, 404)
+
+    def test_bad_get_by_id(self): 
+        response = self.client.get(f"/spot/{self.bad_id}", headers=self.headers)
+        print("Test Bad Get Spot Detail", response.data)
+        self.assertEqual(response.status_code, 404)
+        
+        response = self.client.get(f"/review/read/{self.bad_id}", headers=self.headers)
+        print("Test Bad Get Review", response.data)
+        self.assertEqual(response.status_code, 404)
+
+    def test_bad_post(self):
+        self.reviewData["spotID"] = self.bad_id
+        response = self.client.post("/review/create", data=self.reviewData, headers=self.headers)
+        print("Test Bad Create Review", response)
         self.assertEqual(response.status_code, 404)

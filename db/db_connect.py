@@ -72,8 +72,8 @@ def default_factor_form():
 
 
 def check_document_exist(object_field, field_value, collection):
-    review_cursor = client[DB_NAME][collection].count_documents({object_field: field_value})  # noqa 
-    return True if review_cursor > 0 else False
+    cursor = client[DB_NAME][collection].find({object_field: field_value})
+    return cursor if len(list(cursor)) > 0 else False
 
 
 def get_all_spots():
@@ -109,11 +109,13 @@ def create_spot(spot_document):
 
 
 def fetch_spot_details(spot_id):
-    find_object = {"_id": convert_to_object_id(spot_id)}
     try:
+        find_object = {"_id": convert_to_object_id(spot_id)}
         response = client[DB_NAME]['spots'].find_one(find_object)
+        if not response:
+            return None
         print("Fetch", response)
-    except pm.errors.KeyNotFound:
+    except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Unable to find flavor with id " + spot_id)
 
     today = datetime.today().date().strftime('%Y-%m-%d')
@@ -135,10 +137,13 @@ def update_spot(spot_id, spot_document):
     """
     Update spot object to database
     """
-    filter = {"_id": convert_to_object_id(spot_id)}
-    new_values = {"$set": spot_document}
     LOG.info("Attempting spot update")
     try:
+        spot_id = convert_to_object_id(spot_id)
+        if not check_document_exist("_id", spot_id, "spots"):
+            return None
+        filter = {"_id": spot_id}
+        new_values = {"$set": spot_document}
         spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
         LOG.info("Successfully updated spot" + str(spot_id))
         print(spot_update)
@@ -170,13 +175,18 @@ def delete_spot(spot_id):
 
 
 def create_review(spotID, review_object):
+    try:
+        spotID = convert_to_object_id(spotID)
+        filter = {"_id": spotID}
+        if not check_document_exist("_id", spotID, "spots"):
+            return None
+    except (pm.errors.CursorNotFound, InvalidId):
+        return None
     response = client[DB_NAME]['reviews'].insert_one(review_object)
     print("Create Review", response)
-    filter = {"_id": convert_to_object_id(spotID)}
     new_values = {"$push": {
         "reviews": review_object
     }}
-    # try:
     spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
     LOG.info("Successfully updated spot" + str(spotID))
     print(spot_update)
@@ -199,7 +209,13 @@ def delete_review(reviewID):
 
 
 def get_review_by_spot(spot_id):
-    review_cursor = client[DB_NAME]['reviews'].find({"spotID": spot_id})
+    try:
+        review_cursor = check_document_exist("spotID", spot_id, "reviews")
+        if not review_cursor:
+            return None
+    except (pm.errors.CursorNotFound, InvalidId):
+        return None
+
     reviews = []
     for review in review_cursor:
         json_dump = json.dumps(review, default=bsutil.default)

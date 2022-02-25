@@ -129,8 +129,13 @@ def update_individual_spot_factor(spot_id, factorName, factorRating):
 
 
 def update_spot_factors(spot_id, factorArgs):
+    spot_id = dbc.convert_to_object_id(spot_id)
+    if not dbc.check_document_exist("_id", spot_id, "spots"):
+        return NOT_FOUND
     for factor in factorArgs:
-        update_individual_spot_factor(spot_id, factor, factorArgs[factor])
+        rating = int(factorArgs[factor]["factorValue"])
+        update_individual_spot_factor(spot_id, factor, rating)
+
     return spot_id
 
 
@@ -159,6 +164,8 @@ def add_review(spotID, reviewTitle, reviewText, reviewRating):
     }
     print("Create review object", review_object)
     response = dbc.create_review(spotID, review_object)
+    if not response:
+        return NOT_FOUND
     print("Add Review response: ", response)
     return response
 
