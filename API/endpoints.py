@@ -81,9 +81,8 @@ class SpotList(Resource):
 class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.doc(parser=spotParser)
+    @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
-    @api.doc(security='bearerAuth')
     def post(self):
         """
         Creates a new spot
@@ -122,7 +121,7 @@ class SpotUpdate(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.doc(parser=spotParser)
+    @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
     def put(self, spot_id):
         """
@@ -146,6 +145,7 @@ class SpotDelete(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.doc(security='bearerAuth')
     @authorization_guard
     def delete(self, spot_id):
         """
@@ -165,7 +165,7 @@ class SpotUpdateFactor(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.doc(parser=factorParser)
+    @api.doc(parser=factorParser, security='bearerAuth')
     @authorization_guard
     def put(self, spot_id):
         """
@@ -183,7 +183,7 @@ class SpotUpdateFactor(Resource):
 class ReviewCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
-    @api.doc(parser=reviewParser)
+    @api.doc(parser=reviewParser, security='bearerAuth')
     @authorization_guard
     def post(self):
         """
@@ -208,6 +208,7 @@ class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
+    @api.doc(security='bearerAuth')
     @authorization_guard
     def delete(self, review_id):
         """
