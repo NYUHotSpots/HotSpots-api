@@ -27,9 +27,10 @@ authorizations = {
 app.config['ERROR_404_HELP'] = False
 CORS(app)
 api = Api(app, authorizations=authorizations)
-spots_ns = api.namespace("spots", description = "adjust spots")
-factors_ns = api.namespace("spot_factors", description = "adjust factors for spot")
-review_ns = api.namespace("spot_review", description = "adjust review for spot")
+spots_ns = api.namespace("spots", description="adjust spots")
+factors_ns = api.namespace("spot_factors",
+                           description="adjust factors for spot")
+review_ns = api.namespace("spot_review", description="adjust review for spot")
 
 spotParser = reqparse.RequestParser()
 spotParser.add_argument('spotName', type=str, location='form')
