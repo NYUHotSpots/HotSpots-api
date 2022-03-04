@@ -49,64 +49,64 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
         
     def test_get_all_spots(self):
-        response = self.client.get("/spots/spot/list", headers=self.headers)
+        response = self.client.get("/spots/list", headers=self.headers)
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
     def test_spot_crud(self):
-        response = self.client.post("/spots/spot/create", data=self.spotData, headers=self.headers)
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.get(f"/spots/spot/{spot_id}", headers=self.headers)
+        response = self.client.get(f"/spots/{spot_id}", headers=self.headers)
         print("Test Get Spot Detail", response.data)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.put(f"/spots/spot/update/{spot_id}", data=self.updatedSpotData, headers=self.headers)
+        response = self.client.put(f"/spots/update/{spot_id}", data=self.updatedSpotData, headers=self.headers)
         print("Test Update Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.delete(f"/spots/spot/delete/{spot_id}", headers=self.headers)
+        response = self.client.delete(f"/spots/delete/{spot_id}", headers=self.headers)
         print("Test Delete Spot", response.data)
         self.assertEqual(response.status_code, 200)
         
     def test_review_crud(self):
-        response = self.client.post("/spots/spot/create", data=self.spotData, headers=self.headers)
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         print(response.data)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
         
         self.reviewData["spotID"] = spot_id
-        response = self.client.post("/spot_review/review/create", data=self.reviewData, headers=self.headers)
+        response = self.client.post("/spot_review/create", data=self.reviewData, headers=self.headers)
         review_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review", review_id)
         print(response.data)
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.get(f"/spot_review/review/read/{spot_id}", headers=self.headers)
+        response = self.client.get(f"/spot_review/read/{spot_id}", headers=self.headers)
         print("Test Get Review", response.data)
         self.assertEqual(response.status_code, 200)
 
-        response = self.client.delete(f"/spot_review/review/delete/{review_id}", headers=self.headers)
+        response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
         self.assertEqual(response.status_code, 200)
         
     def test_factor_crud(self):
-        response = self.client.post("/spots/spot/create", data=self.spotData, headers=self.headers)
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.put(f"/spot_factors/factor/update/{spot_id}", json=self.factor, headers=self.headers)
+        response = self.client.put(f"/spot_factors/update/{spot_id}", json=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
     def test_unauthorized_bad_requests(self):
-        response = self.client.post("/spots/spot/create", data=self.spotData)
+        response = self.client.post("/spots/create", data=self.spotData)
         self.assertEqual(response.status_code, 401)
         
         bad_header = {"authorization" : "Bearer "}
-        response = self.client.post("/spots/spot/create", data=self.spotData, headers=bad_header)
+        response = self.client.post("/spots/create", data=self.spotData, headers=bad_header)
         self.assertEqual(response.status_code, 400)
 
     def test_bad_deletes(self):
@@ -116,42 +116,42 @@ class EndpointTestCase(TestCase):
         (if you call delete and that doc isn't found, 
         then mongo will just pretend like it did delete it without raising any error)
         '''
-        response = self.client.delete(f"/spot_review/review/delete/1234", headers=self.headers)
+        response = self.client.delete(f"/spot_delete/1234", headers=self.headers)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.delete(f"/spot_review/review/delete/{self.bad_id}", headers=self.headers)
+        response = self.client.delete(f"/spot_delete/{self.bad_id}", headers=self.headers)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.delete(f"/spots/spot/delete/1234", headers=self.headers)
+        response = self.client.delete(f"/spots/delete/1234", headers=self.headers)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.delete(f"/spots/spot/delete/{self.bad_id}", headers=self.headers)
+        response = self.client.delete(f"/spots/delete/{self.bad_id}", headers=self.headers)
         self.assertEqual(response.status_code, 404)
 
     def test_bad_put(self): 
-        response = self.client.put(f"/spots/spot/update/{self.bad_id}", data=self.updatedSpotData, headers=self.headers)
+        response = self.client.put(f"/spots/update/{self.bad_id}", data=self.updatedSpotData, headers=self.headers)
         print("Test Bad Spot Put")
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.get(f"/spots/spot/{self.bad_id}", headers=self.headers)
+        response = self.client.get(f"/spots/{self.bad_id}", headers=self.headers)
         # make sure it wasn't created
         self.assertEqual(response.status_code, 404)
 
         print("Test Bad Factor Put")
-        response = self.client.put(f"/spot_factors/spot/factor/update/{self.bad_id}", json=self.factor, headers=self.headers)
+        response = self.client.put(f"/spot_factors/update/{self.bad_id}", json=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 404)
 
     def test_bad_get_by_id(self): 
-        response = self.client.get(f"/spots/spot/{self.bad_id}", headers=self.headers)
+        response = self.client.get(f"/spots/{self.bad_id}", headers=self.headers)
         print("Test Bad Get Spot Detail", response.data)
         self.assertEqual(response.status_code, 404)
         
-        response = self.client.get(f"/spot_review/review/read/{self.bad_id}", headers=self.headers)
+        response = self.client.get(f"/spot_read/{self.bad_id}", headers=self.headers)
         print("Test Bad Get Review", response.data)
         self.assertEqual(response.status_code, 404)
 
     def test_bad_post(self):
         self.reviewData["spotID"] = self.bad_id
-        response = self.client.post("/spot_review/review/create", data=self.reviewData, headers=self.headers)
+        response = self.client.post("/spot_create", data=self.reviewData, headers=self.headers)
         print("Test Bad Create Review", response)
         self.assertEqual(response.status_code, 404)

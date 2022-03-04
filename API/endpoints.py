@@ -66,7 +66,7 @@ class HelloWorld(Resource):
         return {"Hola": "Mundo"}
 
 
-@spots_ns.route('/spot/list')
+@spots_ns.route('/list')
 class SpotList(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
@@ -81,7 +81,7 @@ class SpotList(Resource):
             return spots
 
 
-@spots_ns.route('/spot/create')
+@spots_ns.route('/create')
 class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -100,7 +100,7 @@ class SpotCreate(Resource):
             return spot_response
 
 
-@spots_ns.route('/spot/<spot_id>')
+@spots_ns.route('/<spot_id>')
 class SpotDetail(Resource):
     """
     This endpoint returns a details of a spot
@@ -118,7 +118,7 @@ class SpotDetail(Resource):
             return spot_details
 
 
-@spots_ns.route('/spot/update/<spot_id>')
+@spots_ns.route('/update/<spot_id>')
 class SpotUpdate(Resource):
     """
     This endpoint updates a spot
@@ -142,7 +142,7 @@ class SpotUpdate(Resource):
             return f"{spot_response} added."
 
 
-@spots_ns.route('/spot/delete/<spot_id>')
+@spots_ns.route('/delete/<spot_id>')
 class SpotDelete(Resource):
     """
     This endpoint deletes a new spot
@@ -162,7 +162,7 @@ class SpotDelete(Resource):
             return f"{spot_response} deleted."
 
 
-@factors_ns.route('/factor/update/<spot_id>')
+@factors_ns.route('/update/<spot_id>')
 class SpotUpdateFactor(Resource):
     """
     This endpoint updates a spot
@@ -183,7 +183,7 @@ class SpotUpdateFactor(Resource):
             return f"{spot_response} factor updated."
 
 
-@review_ns.route('/review/create')
+@review_ns.route('/create')
 class ReviewCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -207,7 +207,7 @@ class ReviewCreate(Resource):
             return review_response
 
 
-@review_ns.route('/review/delete/<review_id>')
+@review_ns.route('/delete/<review_id>')
 class ReviewDetail(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
@@ -225,7 +225,7 @@ class ReviewDetail(Resource):
             return f"{review_response} deleted."
 
 
-@review_ns.route('/review/read/<spot_id>')
+@review_ns.route('/read/<spot_id>')
 class ReviewSpot(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
