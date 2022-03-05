@@ -35,7 +35,6 @@ def get_auth0_token():
     conn.request("POST", "/oauth/token", payload, headers)
 
     res = conn.getresponse().read()
-    print(res)
     access_token = json.loads(res)["access_token"]
     print("New access token: " + access_token)
     return access_token
@@ -53,9 +52,8 @@ def get_auth0_management_token():
     conn.request("POST", "/oauth/token", payload, headers)
 
     res = conn.getresponse().read()
-    print(res)
     access_token = json.loads(res)["access_token"]
-    print("New access token: " + access_token)
+    print("New management access token: " + access_token)
     
     headers = {
         'Authorization': f'Bearer {access_token}',
@@ -85,7 +83,6 @@ def get_access_token_for_test_user():
     conn.request("POST", "/oauth/token", payload, headers)
 
     res = conn.getresponse().read()
-    print(res)
     access_token = json.loads(res)["access_token"]
     print("New access token test user: " + access_token)
     return access_token

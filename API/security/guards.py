@@ -67,7 +67,6 @@ def permissions_guard(required_permissions=None):
     def decorator(function):
         @wraps(function)
         def wrapper(*args, **kwargs):
-            print("what about here1d")
             access_token = g.get("access_token")
 
             if not access_token:
