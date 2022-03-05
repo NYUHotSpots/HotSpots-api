@@ -12,8 +12,6 @@ audience = os.environ.get("AUTH0_API_AUDIENCE")
 domain = os.environ.get("AUTH0_DOMAIN")
 client_id = os.environ.get("CLIENT_ID")
 client_secret = os.environ.get("CLIENT_SECRET")
-management_client_id = os.environ.get("AUTH0_MANAGEMENT_CLIENT_ID")
-management_client_secret = os.environ.get("AUTH0_MANAGEMENT_CLIENT_SECRET")
 management_audience = os.environ.get("AUTH0_MANAGEMENT_AUDIENCE")
 
 
@@ -43,8 +41,8 @@ def get_auth0_token():
 def get_auth0_management_token():
     conn = http.client.HTTPSConnection("hotspots-dev.us.auth0.com")
     payload = json.dumps({
-        "client_id" : management_client_id, 
-        "client_secret" : management_client_secret, 
+        "client_id" : client_id, 
+        "client_secret" : client_secret, 
         "audience": management_audience,
         "grant_type": "client_credentials"
     })

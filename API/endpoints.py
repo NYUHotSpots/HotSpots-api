@@ -61,6 +61,7 @@ class HelloWorld(Resource):
     """
     @authorization_guard
     @permissions_guard([admin_hotspots_permissions.test])
+    @api.doc(security='bearerAuth')
     def get(self):
         """
         A trivial endpoint to see if the server is running.
