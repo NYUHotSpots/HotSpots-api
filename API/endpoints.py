@@ -10,7 +10,8 @@ from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
 import db.data as db
-from API.security.guards import authorization_guard, permissions_guard
+from API.security.guards import (authorization_guard,
+                                 permissions_guard, admin_hotspots_permissions)
 
 app = Flask(__name__)
 
@@ -59,8 +60,7 @@ class HelloWorld(Resource):
     app is working at all.
     """
     @authorization_guard
-    @permissions_guard(["test:permissions"])
-    @api.doc(security='bearerAuth')
+    @permissions_guard([admin_hotspots_permissions.test])
     def get(self):
         """
         A trivial endpoint to see if the server is running.

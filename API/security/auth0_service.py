@@ -1,7 +1,9 @@
+"""
+This handles authentication
+"""
+
 from http import HTTPStatus
-
 import jwt
-
 from API.security.utils import json_abort, audience, domain
 
 

@@ -4,9 +4,10 @@ This file holds the tests for endpoints.py.
 
 from unittest import TestCase
 import API.endpoints as ep
-from API.security.utils import get_auth0_token
+from API.security.utils import get_auth0_token, get_access_token_for_test_user
 
-bearer = "Bearer " + get_auth0_token()
+bearer = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
+# bearer = "Bearer " + get_auth0_token() # this gives a token that doesn't have the permissions set
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -44,9 +45,16 @@ class EndpointTestCase(TestCase):
         print("Tear Down")
 
     def test_hello(self):
-        response = self.client.get("/hello")
+        response = self.client.get("/hello", headers=self.headers)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+    
+    def test_bad_permissions(self):
+        no_permissions_token = "Bearer " + get_auth0_token()
+        self.headers["authorization"] = no_permissions_token
+        response = self.client.get("/hello", headers=self.headers)
+        print(response.data)
+        self.assertEqual(response.status_code, 403)
         
     def test_get_all_spots(self):
         response = self.client.get("/spots/list", headers=self.headers)
