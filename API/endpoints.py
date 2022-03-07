@@ -59,9 +59,6 @@ class HelloWorld(Resource):
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
     """
-    @authorization_guard
-    @permissions_guard([admin_hotspots_permissions.test])
-    @api.doc(security='bearerAuth')
     def get(self):
         """
         A trivial endpoint to see if the server is running.
@@ -90,6 +87,7 @@ class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser, security='bearerAuth')
+    @permissions_guard([admin_hotspots_permissions.admin])
     @authorization_guard
     def post(self):
         """
@@ -131,6 +129,7 @@ class SpotUpdate(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def put(self, spot_id):
         """
         Update a spot
@@ -155,6 +154,7 @@ class SpotDelete(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def delete(self, spot_id):
         """
         Delete a spot
@@ -218,6 +218,7 @@ class ReviewDetail(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
     @api.doc(security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def delete(self, review_id):
         """
         Deletes a new review

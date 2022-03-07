@@ -19,7 +19,8 @@ invalid_request_error = {
 }
 
 admin_hotspots_permissions = SimpleNamespace(
-    test="test:permissions"
+    test="test:permissions",
+    admin="admin:full-access"
 ) # todo add more permissions+roles after doing more app design work
 
 
