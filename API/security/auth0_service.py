@@ -1,7 +1,9 @@
+"""
+This handles authentication
+"""
+
 from http import HTTPStatus
-
 import jwt
-
 from API.security.utils import json_abort, audience, domain
 
 
@@ -41,6 +43,7 @@ class Auth0Service:
                 audience=self.audience,
                 issuer=self.issuer_url,
             )
+            print("Decoded payload: ", payload)
         except Exception as error:
             json_abort(HTTPStatus.UNAUTHORIZED, {
                 "error": "invalid_token",

@@ -1,6 +1,7 @@
 from functools import wraps
 from http import HTTPStatus
 from types import SimpleNamespace
+import jwt
 
 from flask import request, g
 
@@ -18,11 +19,9 @@ invalid_request_error = {
 }
 
 admin_hotspots_permissions = SimpleNamespace(
-    read="read:admin-hotspots", 
-    write="write:admin-hotspots",
-    update="update:admin-hotspots", 
-    delete="read:admin-hotspots"
-)
+    test="test:permissions",
+    admin="admin:full-access"
+) # todo add more permissions+roles after doing more app design work
 
 
 def get_bearer_token_from_request():
@@ -68,7 +67,7 @@ def authorization_guard(function):
 def permissions_guard(required_permissions=None):
     def decorator(function):
         @wraps(function)
-        def wrapper():
+        def wrapper(*args, **kwargs):
             access_token = g.get("access_token")
 
             if not access_token:
@@ -76,7 +75,7 @@ def permissions_guard(required_permissions=None):
                 return
 
             if required_permissions is None:
-                return function()
+                return function(*args, **kwargs)
 
             if not isinstance(required_permissions, list):
                 json_abort(500, {
@@ -98,7 +97,7 @@ def permissions_guard(required_permissions=None):
                     "message": "Permission denied"
                 })
 
-            return function()
+            return function(*args, **kwargs)
 
         return wrapper
 

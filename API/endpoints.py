@@ -10,7 +10,8 @@ from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
 import db.data as db
-from API.security.guards import authorization_guard
+from API.security.guards import (authorization_guard,
+                                 permissions_guard, admin_hotspots_permissions)
 
 app = Flask(__name__)
 
@@ -86,6 +87,7 @@ class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser, security='bearerAuth')
+    @permissions_guard([admin_hotspots_permissions.admin])
     @authorization_guard
     def post(self):
         """
@@ -127,6 +129,7 @@ class SpotUpdate(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def put(self, spot_id):
         """
         Update a spot
@@ -151,6 +154,7 @@ class SpotDelete(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def delete(self, spot_id):
         """
         Delete a spot
@@ -214,6 +218,7 @@ class ReviewDetail(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
     @api.doc(security='bearerAuth')
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def delete(self, review_id):
         """
         Deletes a new review

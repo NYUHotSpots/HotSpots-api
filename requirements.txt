@@ -11,3 +11,4 @@ PyJWT
 pyjwt[crypto]
 flask_talisman
 Flask-Cors
+requests
