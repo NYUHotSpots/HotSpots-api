@@ -12,6 +12,8 @@ domain = os.environ.get("AUTH0_DOMAIN")
 client_id = os.environ.get("CLIENT_ID")
 client_secret = os.environ.get("CLIENT_SECRET")
 management_audience = os.environ.get("AUTH0_MANAGEMENT_AUDIENCE")
+test_user_email = os.environ.get("TEST_USER_EMAIL")
+test_user_pw = os.environ.get("TEST_USER_PW")
 
 
 def json_abort(status_code, message=None):
@@ -68,8 +70,8 @@ def get_access_token_for_test_user():
         "client_secret": client_secret,
         "otp": "CODE",
         "realm": "email",
-        "username":"john1.doe@gmail.com",
-        "password":"Secrets1!",
+        "username": test_user_email,
+        "password": test_user_pw,
         "audience" : audience,
         "connection": "Username-Password-Authentication",
         "scope": "openid"

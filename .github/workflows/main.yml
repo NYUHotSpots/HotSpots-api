@@ -50,6 +50,8 @@ jobs:
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
           AUTH0_CALLBACK_URL: ${{ secrets.AUTH0_CALLBACK_URL }}
+          TEST_USER_EMAIL: ${{ secrets.TEST_USER_EMAIL }}
+          TEST_USER_PW: ${{ secrets.TEST_USER_PW }}
         run: |
           echo "Hello from main.yml file"
           export PYTHONPATH=$PWD
