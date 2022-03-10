@@ -87,8 +87,8 @@ class SpotCreate(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser, security='bearerAuth')
-    @permissions_guard([admin_hotspots_permissions.admin])
     @authorization_guard
+    @permissions_guard([admin_hotspots_permissions.admin])
     def post(self):
         """
         Creates a new spot

@@ -2,7 +2,6 @@ from flask import abort
 import os
 import http.client
 import json
-import requests
 from dotenv import load_dotenv
 
 load_dotenv()

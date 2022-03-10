@@ -6,7 +6,7 @@ from unittest import TestCase
 import API.endpoints as ep
 from API.security.utils import get_auth0_token, get_access_token_for_test_user
 
-bearer = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
+userToken = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
 # bearer = "Bearer " + get_auth0_token() # this gives a token that doesn't have the permissions set
 
 class EndpointTestCase(TestCase):
@@ -27,7 +27,7 @@ class EndpointTestCase(TestCase):
             "reviewText": "wow what a great app", 
             "reviewRating": "5"
         }
-        self.headers = {"authorization": bearer}
+        self.headers = {"authorization": userToken}
         self.bad_id = "000000000000000000000000"
         self.factor_form = {                
             "factorDate": "2022-02-23",
@@ -52,7 +52,7 @@ class EndpointTestCase(TestCase):
     def test_bad_permissions(self):
         no_permissions_token = "Bearer " + get_auth0_token()
         self.headers["authorization"] = no_permissions_token
-        response = self.client.get("/hello", headers=self.headers)
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         print(response.data)
         self.assertEqual(response.status_code, 403)
         
