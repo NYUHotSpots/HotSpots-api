@@ -43,14 +43,12 @@ class Auth0Service:
                 audience=self.audience,
                 issuer=self.issuer_url,
             )
-            print("Decoded payload: ", payload)
         except Exception as error:
             json_abort(HTTPStatus.UNAUTHORIZED, {
                 "error": "invalid_token",
                 "error_description": error.__str__(),
                 "message": "Bad credentials."
             })
-            return
 
         return payload
 

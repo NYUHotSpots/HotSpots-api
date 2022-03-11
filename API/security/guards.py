@@ -19,7 +19,6 @@ invalid_request_error = {
 }
 
 admin_hotspots_permissions = SimpleNamespace(
-    test="test:permissions",
     admin="admin:full-access"
 ) # todo add more permissions+roles after doing more app design work
 
@@ -29,24 +28,20 @@ def get_bearer_token_from_request():
 
     if not authorization_header:
         json_abort(HTTPStatus.UNAUTHORIZED, unauthorized_error)
-        return
 
     authorization_header_elements = authorization_header.split()
 
     if len(authorization_header_elements) != 2:
         json_abort(HTTPStatus.BAD_REQUEST, invalid_request_error)
-        return
 
     auth_scheme = authorization_header_elements[0]
     bearer_token = authorization_header_elements[1]
 
     if not (auth_scheme and auth_scheme.lower() == "bearer"):
         json_abort(HTTPStatus.UNAUTHORIZED, unauthorized_error)
-        return
 
     if not bearer_token:
         json_abort(HTTPStatus.UNAUTHORIZED, unauthorized_error)
-        return
 
     return bearer_token
 
