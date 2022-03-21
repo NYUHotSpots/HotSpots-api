@@ -96,6 +96,11 @@ class EndpointTestCase(TestCase):
         response = self.client.get(f"/spot_review/read/{spot_id}", headers=self.headers)
         print("Test Get Review", response.data)
         self.assertEqual(response.status_code, 200)
+        
+        self.reviewData["reviewTitle"] = "test_review_crud"
+        response = self.client.put(f"/spot_review/update/{review_id}", data=self.reviewData, headers=self.headers)
+        print("Test Update Review", response.data)
+        self.assertEqual(response.status_code, 200)
 
         response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)

@@ -243,3 +243,28 @@ class ReviewSpot(Resource):
             raise (wz.NotFound(f"Reviews for spot {spot_id} not found."))
         else:
             return spot_review_response
+
+
+@review_ns.route('/update/<review_id>')
+class ReviewUpdate(Resource):
+    """
+    This endpoint updates a review
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
+    @api.doc(parser=factorParser, security='bearerAuth')
+    @authorization_guard
+    def put(self, review_id):
+        """
+        Update a review
+        """
+        args = reviewParser.parse_args()
+        review_response = db.update_review(review_id,
+                                           args["spotID"],
+                                           args['reviewTitle'],
+                                           args['reviewText'],
+                                           args['reviewRating'])
+        if review_response == db.NOT_FOUND:
+            raise (wz.NotFound(f"Spot {review_id} not found."))
+        else:
+            return f"{review_response} factor updated."

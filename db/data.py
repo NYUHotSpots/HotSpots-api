@@ -186,3 +186,17 @@ def get_review_by_spot(spot_id):
     """
     response = dbc.get_review_by_spot(spot_id)
     return response if response is not None else NOT_FOUND
+
+
+def update_review(review_id, spot_id, reviewTitle, reviewText, reviewRating):
+    review_document = {
+        "spotID": spot_id,
+        "reviewTitle": reviewTitle,
+        "reviewText": reviewText,
+        "reviewRating": reviewRating,
+        "reviewUpdate": str(datetime.now())
+    }
+    response = dbc.update_review(review_id, review_document)
+    if response is None:
+        return NOT_FOUND
+    return response
