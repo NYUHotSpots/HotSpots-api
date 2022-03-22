@@ -18,7 +18,7 @@ invalid_request_error = {
     "message": "Requires authentication"
 }
 
-admin_hotspots_permissions = SimpleNamespace(
+hotspots_permissions = SimpleNamespace(
     admin="admin:full-access"
 ) # todo add more permissions+roles after doing more app design work
 
@@ -51,8 +51,11 @@ def authorization_guard(function):
     def decorator(*args, **kwargs):
         token = get_bearer_token_from_request()
         validated_token = auth0_service.validate_jwt(token)
-
+        user_id = validated_token["sub"]
+        permissions = validated_token["permissions"]
         g.access_token = validated_token
+        g.user_id = user_id
+        g.permissions = permissions
 
         return function(*args, **kwargs)
 

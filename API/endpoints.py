@@ -4,14 +4,14 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask, request
+from flask import Flask, request, g
 from flask_cors import CORS
 from flask_restx import Resource, Api, reqparse
 import werkzeug.exceptions as wz
 
 import db.data as db
 from API.security.guards import (authorization_guard,
-                                 permissions_guard, admin_hotspots_permissions)
+                                 permissions_guard, hotspots_permissions)
 
 app = Flask(__name__)
 
@@ -88,13 +88,12 @@ class SpotCreate(Resource):
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
-    @permissions_guard([admin_hotspots_permissions.admin])
+    @permissions_guard([hotspots_permissions.admin])
     def post(self):
         """
         Creates a new spot
         """
         args = spotParser.parse_args()
-        print(args)
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
                                     args['spotCapacity'], args['spotImage'])
         if spot_response == db.DUPLICATE:
@@ -130,7 +129,7 @@ class SpotUpdate(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(parser=spotParser, security='bearerAuth')
     @authorization_guard
-    @permissions_guard([admin_hotspots_permissions.admin])
+    @permissions_guard([hotspots_permissions.admin])
     def put(self, spot_id):
         """
         Update a spot
@@ -155,7 +154,7 @@ class SpotDelete(Resource):
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
     @api.doc(security='bearerAuth')
     @authorization_guard
-    @permissions_guard([admin_hotspots_permissions.admin])
+    @permissions_guard([hotspots_permissions.admin])
     def delete(self, spot_id):
         """
         Delete a spot
@@ -202,7 +201,8 @@ class ReviewCreate(Resource):
         review_response = db.add_review(args["spotID"],
                                         args['reviewTitle'],
                                         args['reviewText'],
-                                        args['reviewRating'])
+                                        args['reviewRating'],
+                                        g.user_id)
         if review_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Review already exists."))
         elif review_response == db.NOT_FOUND:
@@ -213,18 +213,21 @@ class ReviewCreate(Resource):
 
 
 @review_ns.route('/delete/<review_id>')
-class ReviewDetail(Resource):
+class ReviewDelete(Resource):
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_ACCEPTABLE, 'A duplicate key')
     @api.response(HTTPStatus.NOT_FOUND, 'Review not found')
     @api.doc(security='bearerAuth')
     @authorization_guard
-    @permissions_guard([admin_hotspots_permissions.admin])
     def delete(self, review_id):
         """
         Deletes a new review
         """
-        review_response = db.delete_review(review_id)
+        if hotspots_permissions.admin in g.permissions:
+            admin = True
+        else:
+            admin = False
+        review_response = db.delete_review(review_id, g.user_id, admin)
         if review_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Review {review_id} not found."))
         else:
@@ -264,7 +267,8 @@ class ReviewUpdate(Resource):
                                            args["spotID"],
                                            args['reviewTitle'],
                                            args['reviewText'],
-                                           args['reviewRating'])
+                                           args['reviewRating'],
+                                           g.user_id)
         if review_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Spot {review_id} not found."))
         else:

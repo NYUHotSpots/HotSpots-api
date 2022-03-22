@@ -149,7 +149,7 @@ def delete_spot(spot_id):
     return response
 
 
-def add_review(spotID, reviewTitle, reviewText, reviewRating):
+def add_review(spotID, reviewTitle, reviewText, reviewRating, user_id):
     """
     Return a dictionary of created review.
     """
@@ -160,7 +160,8 @@ def add_review(spotID, reviewTitle, reviewText, reviewRating):
         "reviewUpdate": str(datetime.now()),
         "reviewTitle": reviewTitle,
         "reviewText": reviewText,
-        "reviewRating": reviewRating
+        "reviewRating": reviewRating,
+        "userID": user_id
     }
     print("Create review object", review_object)
     response = dbc.create_review(spotID, review_object)
@@ -170,11 +171,11 @@ def add_review(spotID, reviewTitle, reviewText, reviewRating):
     return response
 
 
-def delete_review(reviewID):
+def delete_review(reviewID, user_id, admin):
     """
     Deletes a review
     """
-    response = dbc.delete_review(reviewID)
+    response = dbc.delete_review(reviewID, user_id, admin)
     if response is None:
         return NOT_FOUND
     return response
@@ -188,7 +189,8 @@ def get_review_by_spot(spot_id):
     return response if response is not None else NOT_FOUND
 
 
-def update_review(review_id, spot_id, reviewTitle, reviewText, reviewRating):
+def update_review(review_id, spot_id, reviewTitle,
+                  reviewText, reviewRating, user_id):
     review_document = {
         "spotID": spot_id,
         "reviewTitle": reviewTitle,
@@ -196,7 +198,7 @@ def update_review(review_id, spot_id, reviewTitle, reviewText, reviewRating):
         "reviewRating": reviewRating,
         "reviewUpdate": str(datetime.now())
     }
-    response = dbc.update_review(review_id, review_document)
+    response = dbc.update_review(review_id, review_document, user_id)
     if response is None:
         return NOT_FOUND
     return response

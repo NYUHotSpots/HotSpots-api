@@ -8,6 +8,7 @@ from API.security.utils import get_auth0_token, get_access_token_for_test_user
 
 userToken = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
 # bearer = "Bearer " + get_auth0_token() # this gives a token that doesn't have the permissions set
+no_permissions_token = "Bearer " + get_auth0_token()
 
 class EndpointTestCase(TestCase):
     def setUp(self):
@@ -28,6 +29,7 @@ class EndpointTestCase(TestCase):
             "reviewRating": "5"
         }
         self.headers = {"authorization": userToken}
+        self.bad_headers = {"authorization": no_permissions_token}
         self.bad_id = "000000000000000000000000"
         self.factor_form = {                
             "factorDate": "2022-02-23",
@@ -50,9 +52,7 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 200)
     
     def test_bad_permissions(self):
-        no_permissions_token = "Bearer " + get_auth0_token()
-        self.headers["authorization"] = no_permissions_token
-        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.bad_headers)
         print(response.data)
         self.assertEqual(response.status_code, 403)
         
@@ -171,3 +171,33 @@ class EndpointTestCase(TestCase):
         response = self.client.post("/spot_create", data=self.reviewData, headers=self.headers)
         print("Test Bad Create Review", response)
         self.assertEqual(response.status_code, 404)
+
+    def test_bad_user_update_delete_reviw(self):
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
+        print(response.data)
+        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        print("Test Bad Review (Make Spot First)", spot_id)
+        self.assertEqual(response.status_code, 200)
+        
+        self.reviewData["spotID"] = spot_id
+        response = self.client.post("/spot_review/create", data=self.reviewData, headers=self.headers)
+        review_id = response.data.decode("utf-8").strip().strip("\"")
+        print("Test Bad Review (Make Review First)", review_id)
+        print(response.data)
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.put(f"/spot_review/update/{review_id}", data=self.reviewData, headers=self.bad_headers)
+        print("Test Update Wrong User", response.data)
+        self.assertEqual(response.status_code, 403)
+        
+        response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.bad_headers)
+        print("Test Delete Wrong User", response.data)
+        self.assertEqual(response.status_code, 403)
+        
+        response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
+        print("Test Delete Wrong User", response.data)
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.delete(f"/spots/delete/{spot_id}", headers=self.headers)
+        print("Test Delete Spot", response.data)
+        self.assertEqual(response.status_code, 200)
