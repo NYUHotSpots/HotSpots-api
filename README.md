@@ -61,7 +61,8 @@ Collections: Reviews
   reviewText,
   reviewRating
   reviewCreation, 
-  reviewUpdate
+  reviewUpdate,
+  userID
 }
 ```
 
