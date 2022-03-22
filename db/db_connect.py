@@ -71,9 +71,9 @@ def default_factor_form():
             }
 
 
-def check_document_exist(object_field, field_value, collection):
-    cursor = client[DB_NAME][collection].find({object_field: field_value})
-    return cursor if len(list(cursor)) > 0 else False
+def check_document_exist(field, field_value, collection):
+    cursor = list(client[DB_NAME][collection].find({field: field_value}))
+    return cursor if len(cursor) > 0 else False
 
 
 def get_all_spots():
