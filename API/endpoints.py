@@ -101,6 +101,7 @@ class SpotCreate(Resource):
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
+            print("SpotCreate", spot_response)
             return spot_response
 
 
@@ -212,6 +213,7 @@ class ReviewCreate(Resource):
             spotID = args["spotID"]
             raise (wz.NotFound(f"Spot {spotID} doesn't exist"))
         else:
+            print("ReviewCreate", review_response)
             return review_response
 
 
