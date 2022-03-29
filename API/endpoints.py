@@ -93,15 +93,12 @@ class SpotCreate(Resource):
         """
         Creates a new spot
         """
-        print("SpotCreate CAN THIS PRINT")
         args = spotParser.parse_args()
-        print(args)
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
                                     args['spotCapacity'], args['spotImage'])
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
-            print("SpotCreate", spot_response)
             return spot_response
 
 
@@ -200,9 +197,7 @@ class ReviewCreate(Resource):
         """
         Creates a new review
         """
-        print("ReviewCreate CAN THIS PRINT")
         args = reviewParser.parse_args()
-        print(args)
         review_response = db.add_review(args["spotID"],
                                         args['reviewTitle'],
                                         args['reviewText'],

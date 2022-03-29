@@ -4,6 +4,7 @@ This file holds the tests for endpoints.py.
 
 from unittest import TestCase
 import API.endpoints as ep
+import json
 from API.security.utils import get_auth0_token, get_access_token_for_test_user
 
 userToken = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
@@ -41,6 +42,18 @@ class EndpointTestCase(TestCase):
             "factorAmbiance": self.factor_form
         }
     
+    def proper_spot_structure(self, spotDetail):
+        fields = ["_id"] + list(self.spotData.keys()) + list(self.factor.keys())
+        self.structure_test(fields, spotDetail)
+    
+    def proper_review_structure(self, reviewDetail):
+        fields = self.reviewData.keys()
+        self.structure_test(fields, reviewDetail)
+    
+    def structure_test(self, fields, detail):
+        for field in fields:
+            self.assertIn(field, detail)
+    
     def tearDown(self):
         print("Tear Down")
 
@@ -70,6 +83,8 @@ class EndpointTestCase(TestCase):
         response = self.client.get(f"/spots/{spot_id}", headers=self.headers)
         print("Test Get Spot Detail", response.data)
         self.assertEqual(response.status_code, 200)
+        spotDetail = json.loads(response.data.decode("utf-8"))
+        self.proper_spot_structure(spotDetail)
 
         response = self.client.put(f"/spots/update/{spot_id}", data=self.updatedSpotData, headers=self.headers)
         print("Test Update Spot", response.data)
@@ -78,7 +93,7 @@ class EndpointTestCase(TestCase):
         response = self.client.delete(f"/spots/delete/{spot_id}", headers=self.headers)
         print("Test Delete Spot", response.data)
         self.assertEqual(response.status_code, 200)
-        
+
     def test_review_crud(self):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         print(response.data)
@@ -96,6 +111,8 @@ class EndpointTestCase(TestCase):
         response = self.client.get(f"/spot_review/read/{spot_id}", headers=self.headers)
         print("Test Get Review", response.data)
         self.assertEqual(response.status_code, 200)
+        reviewDetail = json.loads(response.data.decode("utf-8"))[0]
+        self.proper_review_structure(reviewDetail)
 
         response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
