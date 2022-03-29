@@ -34,10 +34,10 @@ factors_ns = api.namespace("spot_factors",
 review_ns = api.namespace("spot_review", description="adjust review for spot")
 
 spotParser = reqparse.RequestParser()
-spotParser.add_argument('spotName', type=str, location='json')
-spotParser.add_argument('spotImage', type=str, location='json')
-spotParser.add_argument('spotAddress', type=str, location='json')
-spotParser.add_argument('spotCapacity', type=str, location='json')
+spotParser.add_argument('spotName', type=str, location='form')
+spotParser.add_argument('spotImage', type=str, location='form')
+spotParser.add_argument('spotAddress', type=str, location='form')
+spotParser.add_argument('spotCapacity', type=str, location='form')
 
 reviewParser = reqparse.RequestParser()
 reviewParser.add_argument('spotID', type=str, location='form')
