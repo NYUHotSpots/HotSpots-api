@@ -257,7 +257,7 @@ class ReviewUpdate(Resource):
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
-    @api.doc(parser=factorParser, security='bearerAuth')
+    @api.doc(parser=reviewParser, security='bearerAuth')
     @authorization_guard
     def put(self, review_id):
         """
