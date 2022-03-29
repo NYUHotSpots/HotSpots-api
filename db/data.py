@@ -77,6 +77,9 @@ def get_spot_detail(spot_id):
     response = dbc.fetch_spot_details(spot_id)
     if response is None:
         return NOT_FOUND
+    reviews = get_review_by_spot(spot_id)
+    if reviews is not NOT_FOUND:
+        response["reviews"] = reviews
     return response
 
 

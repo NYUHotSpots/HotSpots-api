@@ -179,19 +179,12 @@ def delete_spot(spot_id):
 def create_review(spotID, review_object):
     try:
         spotID = convert_to_object_id(spotID)
-        filter = {"_id": spotID}
         if not check_document_exist("_id", spotID, "spots"):
             return None
     except (pm.errors.CursorNotFound, InvalidId):
         return None
     response = client[DB_NAME]['reviews'].insert_one(review_object)
     print("Create Review", response)
-    new_values = {"$push": {
-        "reviews": review_object
-    }}
-    spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
-    LOG.info("Successfully updated spot" + str(spotID))
-    print(spot_update)
     return str(review_object["_id"])
 
 
