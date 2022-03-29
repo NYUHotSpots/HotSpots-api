@@ -34,10 +34,10 @@ factors_ns = api.namespace("spot_factors",
 review_ns = api.namespace("spot_review", description="adjust review for spot")
 
 spotParser = reqparse.RequestParser()
-spotParser.add_argument('spotName', type=str, location='json')
-spotParser.add_argument('spotImage', type=str, location='json')
-spotParser.add_argument('spotAddress', type=str, location='json')
-spotParser.add_argument('spotCapacity', type=str, location='json')
+spotParser.add_argument('spotName', type=str, location='form')
+spotParser.add_argument('spotImage', type=str, location='form')
+spotParser.add_argument('spotAddress', type=str, location='form')
+spotParser.add_argument('spotCapacity', type=str, location='form')
 
 reviewParser = reqparse.RequestParser()
 reviewParser.add_argument('spotID', type=str, location='form')
@@ -93,12 +93,14 @@ class SpotCreate(Resource):
         """
         Creates a new spot
         """
+        print("SpotCreate CAN THIS PRINT")
         args = spotParser.parse_args()
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
                                     args['spotCapacity'], args['spotImage'])
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
+            print("SpotCreate", spot_response)
             return spot_response
 
 
@@ -197,7 +199,9 @@ class ReviewCreate(Resource):
         """
         Creates a new review
         """
+        print("ReviewCreate CAN THIS PRINT")
         args = reviewParser.parse_args()
+        print(args)
         review_response = db.add_review(args["spotID"],
                                         args['reviewTitle'],
                                         args['reviewText'],
@@ -209,6 +213,7 @@ class ReviewCreate(Resource):
             spotID = args["spotID"]
             raise (wz.NotFound(f"Spot {spotID} doesn't exist"))
         else:
+            print("ReviewCreate", review_response)
             return review_response
 
 

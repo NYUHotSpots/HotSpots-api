@@ -1,5 +1,5 @@
 # HotSpots API
-
+ 
 [![GitHub Actions Build Status](https://github.com/NYUHotSpots/HotSpots-api/actions/workflows/main.yml/badge.svg)](https://github.com/NYUHotSpots/HotSpots-api/actions)
 
 [Heroku App](https://hotspotsapi.herokuapp.com/)
