@@ -118,6 +118,14 @@ class EndpointTestCase(TestCase):
         response = self.client.put(f"/spot_review/update/{review_id}", data=self.reviewData, headers=self.headers)
         print("Test Update Review", response.data)
         self.assertEqual(response.status_code, 200)
+        
+        response = self.client.get(f"/spot_review/read/{spot_id}", headers=self.headers)
+        reviews = json.loads(response.data.decode("utf-8"))
+        for review in reviews: 
+            # since it returns a list, we need the find the updated one
+            if (review["_id"]["$oid"] == review_id):
+                self.assertEqual(review["reviewTitle"], "test_review_crud")
+                break
          
         response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
         print("Test Delete Review", response.data)
