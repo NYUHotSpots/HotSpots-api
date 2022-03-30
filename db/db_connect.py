@@ -10,6 +10,8 @@ from bson.errors import InvalidId
 from dotenv import load_dotenv
 from datetime import datetime
 
+from API.security.utils import json_abort
+
 load_dotenv()
 
 username = os.environ.get("MONGO_USER")
@@ -186,15 +188,18 @@ def create_review(spotID, review_object):
     return str(review_object["_id"])
 
 
-def delete_review(reviewID):
+def delete_review(review_id, user_id, admin):
     LOG.info("Attempting review deletion")
     try:
-        reviewID = convert_to_object_id(reviewID)
-        if not (check_document_exist("_id", reviewID, "reviews")):
+        review_id = convert_to_object_id(review_id)
+        review_cursor = check_document_exist("_id", review_id, "reviews")
+        if not review_cursor:
             return None
-        filter = {"_id": convert_to_object_id(reviewID)}
+        elif not admin:
+            check_user_id_on_review(review_cursor, user_id)
+        filter = {"_id": convert_to_object_id(review_id)}
         review_deletion = client[DB_NAME]['reviews'].delete_one(filter)
-        LOG.info("Successfully deleted review " + str(reviewID))
+        LOG.info("Successfully deleted review " + str(review_id))
         return review_deletion
     except (pm.errors.CursorNotFound, InvalidId):
         LOG.info("Review does not exist in DB")
@@ -214,6 +219,45 @@ def get_review_by_spot(spot_id):
         json_dump = json.dumps(review, default=bsutil.default)
         reviews.append(json.loads(json_dump))
     return reviews
+
+
+def update_review(review_id, review_document, user_id):
+    """
+    Update review object to database
+    """
+    LOG.info("Attempting review update")
+    try:
+        review_id = convert_to_object_id(review_id)
+        review_cursor = check_document_exist("_id", review_id, "reviews")
+        if not review_cursor:
+            return None
+        else:
+            check_user_id_on_review(review_cursor, user_id)
+        filter = {"_id": review_id}
+        new_values = {"$set": review_document}
+        review_update = update_document(filter, new_values, "reviews")
+        LOG.info("Successfully updated review" + str(review_id))
+        print(review_update)
+        return review_update
+    except (pm.errors.CursorNotFound, InvalidId):
+        return None
+
+
+def check_user_id_on_review(review_cursor, user_id):
+    for review in review_cursor:
+        if review["userID"] != user_id:
+            json_abort(403, {"message": "Permission denied"})
+
+
+def update_document(filter, new_values, collection):
+    try:
+        return client[DB_NAME][collection].update_one(filter, new_values)
+    except pm.errors.KeyNotFound:
+        LOG.error("Flavor does not exist in DB")
+        return None
+    except pm.errors.UpdateOperationFailed:
+        LOG.error("Error occurred while updating DB, try again later")
+        return None
 
 
 def get_spot_factor(spot_id, factorName):
