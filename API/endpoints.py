@@ -47,10 +47,10 @@ reviewParser.add_argument('reviewRating', type=int, location='form')
 
 # each will be a number from 1 to 10
 factorParser = reqparse.RequestParser()
-factorParser.add_argument('factorAvailability', type=dict, location='form')
-factorParser.add_argument('factorNoiseLevel', type=dict, location='form')
-factorParser.add_argument('factorTemperature', type=dict, location='form')
-factorParser.add_argument('factorAmbiance', type=dict, location='form')
+factorParser.add_argument('factorAvailability', type=str, location='form')
+factorParser.add_argument('factorNoiseLevel', type=str, location='form')
+factorParser.add_argument('factorTemperature', type=str, location='form')
+factorParser.add_argument('factorAmbiance', type=str, location='form')
 
 
 @api.route('/hello')
@@ -179,7 +179,8 @@ class SpotUpdateFactor(Resource):
         """
         Update a spot factor
         """
-        args = request.get_json(force=True)
+        # args = request.get_json(force=True)
+        args = factorParser.parse_args()
         spot_response = db.update_spot_factors(spot_id, args)
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Spot {spot_id} not found."))

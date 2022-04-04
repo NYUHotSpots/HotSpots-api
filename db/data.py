@@ -136,7 +136,8 @@ def update_spot_factors(spot_id, factorArgs):
     if not dbc.check_document_exist("_id", spot_id, "spots"):
         return NOT_FOUND
     for factor in factorArgs:
-        rating = int(factorArgs[factor]["factorValue"])
+        print(factor, factorArgs[factor])
+        rating = int(factorArgs[factor])
         update_individual_spot_factor(spot_id, factor, rating)
 
     return spot_id
