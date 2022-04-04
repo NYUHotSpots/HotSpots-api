@@ -32,16 +32,23 @@ class EndpointTestCase(TestCase):
         self.headers = {"authorization": userToken}
         self.bad_headers = {"authorization": no_permissions_token}
         self.bad_id = "000000000000000000000000"
-        self.factor_form = {                
-            "factorDate": "2022-02-23",
-            "factorValue": "4",
-            "factorNumOfInputs": "1"
-        }
+        # self.factor_form = {                
+        #     "factorDate": "2022-02-23",
+        #     "factorValue": "4",
+        #     "factorNumOfInputs": "1"
+        # }
+        # self.factor = {
+        #     "factorAvailability": self.factor_form,
+        #     "factorNoiseLevel": self.factor_form,
+        #     "factorTemperature": self.factor_form,
+        #     "factorAmbiance": self.factor_form
+        # }
+
         self.factor = {
-            "factorAvailability": self.factor_form,
-            "factorNoiseLevel": self.factor_form,
-            "factorTemperature": self.factor_form,
-            "factorAmbiance": self.factor_form
+            "factorAvailability": "1",
+            "factorNoiseLevel": "2",
+            "factorTemperature": "3",
+            "factorAmbiance": "4"
         }
     
     def proper_spot_structure(self, spotDetail):
@@ -136,7 +143,7 @@ class EndpointTestCase(TestCase):
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         self.assertEqual(response.status_code, 200)
         
-        response = self.client.put(f"/spot_factors/update/{spot_id}", json=self.factor, headers=self.headers)
+        response = self.client.put(f"/spot_factors/update/{spot_id}", data=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 200)
 
     def test_unauthorized_bad_requests(self):
@@ -176,7 +183,7 @@ class EndpointTestCase(TestCase):
         self.assertEqual(response.status_code, 404)
 
         print("Test Bad Factor Put")
-        response = self.client.put(f"/spot_factors/update/{self.bad_id}", json=self.factor, headers=self.headers)
+        response = self.client.put(f"/spot_factors/update/{self.bad_id}", data=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 404)
 
     def test_bad_get_by_id(self): 
