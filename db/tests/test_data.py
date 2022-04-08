@@ -23,5 +23,5 @@ class DBTestCase(TestCase):
         """
         Tests if we can get reviews of a spot
         """
-        reviews = db.get_review_by_spot("6242098a27c3e23e357a156a")
+        reviews = db.get_review_by_spot("6250aa71bc5ef4d755bdc3c2")
         self.assertIsInstance(reviews, list)

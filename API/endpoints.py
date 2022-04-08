@@ -94,11 +94,14 @@ class SpotCreate(Resource):
         Creates a new spot
         """
         args = spotParser.parse_args()
-        spot_response = db.add_spot(args['spotName'], args['spotAddress'],
-                                    args['spotCapacity'], args['spotImage'])
-        if spot_response == db.DUPLICATE:
+        spot_id = db.add_spot(args['spotName'], args['spotAddress'],
+                              args['spotCapacity'], args['spotImage'])
+        if spot_id == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
+            spot_response = {"spotID": spot_id}
+            spot_response["_links"] = {"collection": "/spots/list",
+                                       "self": f"/spots/{spot_id}"}
             return spot_response
 
 

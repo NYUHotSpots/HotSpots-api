@@ -76,7 +76,7 @@ class EndpointTestCase(TestCase):
         
     def test_spot_crud(self):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
-        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        spot_id = json.loads(response.data.decode("utf-8"))["spotID"].strip().strip("\"")
         print("Test Create Spot", spot_id)
         self.assertEqual(response.status_code, 200)
         
@@ -97,7 +97,7 @@ class EndpointTestCase(TestCase):
     def test_review_crud(self):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         print(response.data)
-        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        spot_id = json.loads(response.data.decode("utf-8"))["spotID"].strip().strip("\"")
         print("Test Create Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
         
@@ -133,7 +133,7 @@ class EndpointTestCase(TestCase):
         
     def test_factor_crud(self):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
-        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        spot_id = json.loads(response.data.decode("utf-8"))["spotID"].strip().strip("\"")
         self.assertEqual(response.status_code, 200)
         
         response = self.client.put(f"/spot_factors/update/{spot_id}", json=self.factor, headers=self.headers)
@@ -197,7 +197,7 @@ class EndpointTestCase(TestCase):
     def test_bad_user_update_delete_review(self):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         print(response.data)
-        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        spot_id = json.loads(response.data.decode("utf-8"))["spotID"].strip().strip("\"")
         print("Test Bad Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
         
