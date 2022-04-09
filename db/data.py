@@ -106,18 +106,23 @@ def update_spot_factors(spot_id, factor_update):
         new_spot_doc["factorTemperature"] = 0
         new_spot_doc["factorAmbiance"] = 0
 
-    new_spot_doc["numFactorEntries"] += 1
     N = new_spot_doc["numFactorEntries"]
+    new_spot_doc["numFactorEntries"] += 1
     for f_field in FACTORS:
         old_avg = new_spot_doc[f_field]
-        new_spot_doc[f_field] = get_average(old_avg, N, factor_update[f_field])
+        new_value = factor_update[f_field]
+        if new_value < 1:
+            new_value = 0
+        elif new_value > 5:
+            new_value = 5
+        new_spot_doc[f_field] = get_average(old_avg, N, new_value)
 
     dbc.update_spot_factor(spot_id, new_spot_doc)
     return spot_id
 
 
 def get_average(old_average, n, new_value):
-    return ((old_average * n-1) + new_value)/n
+    return ((old_average * n) + new_value)/(n+1)
 
 
 def delete_spot(spot_id):
