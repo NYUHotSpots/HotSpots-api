@@ -65,7 +65,12 @@ def convert_to_object_id(flavor_id):
     return bsutil.ObjectId(flavor_id)
 
 
+# deprecated
 def default_factor_form():
+    """
+    Sets up default blank form. 
+    Will delete soon
+    """
     return {
             "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
             "factorValue": 0,
