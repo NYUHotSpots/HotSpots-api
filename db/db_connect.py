@@ -65,17 +65,15 @@ def convert_to_object_id(flavor_id):
     return bsutil.ObjectId(flavor_id)
 
 
-# deprecated
-def default_factor_form():
-    """
-    Sets up default blank form. 
-    Will delete soon
-    """
-    return {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": 0,
-            "factorNumOfInputs": 0
-            }
+def reset_factor(spot):
+    today = datetime.today().date().strftime('%Y-%m-%d')
+    spot["numFactorEntries"] = 0
+    spot["factorDate"] = today
+    spot["factorAvailability"] = 0
+    spot["factorNoiseLevel"] = 0
+    spot["factorTemperature"] = 0
+    spot["factorAmbiance"] = 0
+    return spot
 
 
 def check_document_exist(field, field_value, collection):
@@ -84,18 +82,17 @@ def check_document_exist(field, field_value, collection):
 
 
 def get_all_spots():
-    all_spots_cursor = client[DB_NAME]['spots'].find(
-        {}, {"spotName": 1, "spotAddress": 1,
-             "spotImage": 1, "factorAvailability": 1})
+    filter = {"spotName": {"$exists": True}}
+    spots_cursor = client[DB_NAME]['spots'].find(filter)
     output_spots = []
-    for doc in all_spots_cursor:
+    for doc in spots_cursor:
         today = datetime.today().date().strftime('%Y-%m-%d')
-        factorDate = doc["factorAvailability"]["factorDate"]
+        print(doc)
+        factorDate = doc["factorDate"]
         if factorDate != today:
             print("DC Connect, Wrong date")
-            spot_document = {"factorAvailability": default_factor_form()}
-            doc["factorAvailability"] = default_factor_form()
-            update_spot_factor(doc["_id"], spot_document)
+            new_spot_factors = reset_factor(doc)
+            update_spot_factor(doc["_id"], new_spot_factors)
         json_dump = json.dumps(doc, default=bsutil.default)
         output_spots.append(json.loads(json_dump))
     return output_spots
@@ -126,16 +123,9 @@ def fetch_spot_details(spot_id):
         LOG.error("Unable to find flavor with id " + spot_id)
 
     today = datetime.today().date().strftime('%Y-%m-%d')
-    factors = ["factorAvailability", "factorNoiseLevel",
-               "factorTemperature", "factorAmbiance"]
-    for factor in factors:
-        factorDate = response[factor]["factorDate"]
-        if factorDate != today:
-            print("DB Connect, Wrong date for", factor)
-            spot_document = {}
-            spot_document[factor] = default_factor_form()
-            response[factor] = default_factor_form()
-            update_spot_factor(response["_id"], spot_document)
+    if response["factorDate"] != today:
+        reset_factor(response)
+    update_spot_factor(response["_id"], response)
     json_response = json.loads(json.dumps(response, default=bsutil.default))
     return json_response
 

@@ -32,18 +32,6 @@ class EndpointTestCase(TestCase):
         self.headers = {"authorization": userToken}
         self.bad_headers = {"authorization": no_permissions_token}
         self.bad_id = "000000000000000000000000"
-        # self.factor_form = {                
-        #     "factorDate": "2022-02-23",
-        #     "factorValue": "4",
-        #     "factorNumOfInputs": "1"
-        # }
-        # self.factor = {
-        #     "factorAvailability": self.factor_form,
-        #     "factorNoiseLevel": self.factor_form,
-        #     "factorTemperature": self.factor_form,
-        #     "factorAmbiance": self.factor_form
-        # }
-
         self.factor = {
             "factorAvailability": "1",
             "factorNoiseLevel": "2",
