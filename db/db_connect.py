@@ -11,6 +11,7 @@ from dotenv import load_dotenv
 from datetime import datetime
 
 from API.security.utils import json_abort
+from db.models import RESET_FACTORS
 
 load_dotenv()
 
@@ -65,15 +66,11 @@ def convert_to_object_id(flavor_id):
     return bsutil.ObjectId(flavor_id)
 
 
-def reset_factor(spot):
+def reset_factor():
     today = datetime.today().date().strftime('%Y-%m-%d')
-    spot["numFactorEntries"] = 0
-    spot["factorDate"] = today
-    spot["factorAvailability"] = 0
-    spot["factorNoiseLevel"] = 0
-    spot["factorTemperature"] = 0
-    spot["factorAmbiance"] = 0
-    return spot
+    reset_factor = RESET_FACTORS
+    reset_factor["factorDate"] = today
+    return reset_factor
 
 
 def check_document_exist(field, field_value, collection):
@@ -87,11 +84,10 @@ def get_all_spots():
     output_spots = []
     for doc in spots_cursor:
         today = datetime.today().date().strftime('%Y-%m-%d')
-        print(doc)
         factorDate = doc["factorDate"]
         if factorDate != today:
             print("DC Connect, Wrong date")
-            new_spot_factors = reset_factor(doc)
+            new_spot_factors = reset_factor()
             update_spot_factor(doc["_id"], new_spot_factors)
         json_dump = json.dumps(doc, default=bsutil.default)
         output_spots.append(json.loads(json_dump))
@@ -124,8 +120,8 @@ def fetch_spot_details(spot_id):
 
     today = datetime.today().date().strftime('%Y-%m-%d')
     if response["factorDate"] != today:
-        reset_factor(response)
-    update_spot_factor(response["_id"], response)
+        resetted = reset_factor()
+        update_spot_factor(response["_id"], resetted)
     json_response = json.loads(json.dumps(response, default=bsutil.default))
     return json_response
 

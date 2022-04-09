@@ -38,6 +38,7 @@ class EndpointTestCase(TestCase):
             "factorTemperature": "3",
             "factorAmbiance": "4"
         }
+        self.delete_ids = {"spot":[], "review":[]}
     
     def proper_spot_structure(self, spotDetail):
         fields = ["_id"] + list(self.spotData.keys()) + list(self.factor.keys())
@@ -53,6 +54,11 @@ class EndpointTestCase(TestCase):
     
     def tearDown(self):
         print("Tear Down")
+        print(self.delete_ids)
+        for id in self.delete_ids["spot"]:
+            self.client.delete(f"/spots/delete/{id}", headers=self.headers)
+        for id in self.delete_ids["review"]:
+            self.client.delete(f"/spot_review/delete/{id}", headers=self.headers)
 
     def test_hello(self):
         response = self.client.get("/hello", headers=self.headers)
@@ -95,6 +101,7 @@ class EndpointTestCase(TestCase):
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Create Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
+        self.delete_ids["spot"].append(spot_id)
         
         self.reviewData["spotID"] = spot_id
         response = self.client.post("/spot_review/create", data=self.reviewData, headers=self.headers)
@@ -130,6 +137,7 @@ class EndpointTestCase(TestCase):
         response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         self.assertEqual(response.status_code, 200)
+        self.delete_ids["spot"].append(spot_id)
         
         response = self.client.put(f"/spot_factors/update/{spot_id}", data=self.factor, headers=self.headers)
         self.assertEqual(response.status_code, 200)
@@ -195,6 +203,7 @@ class EndpointTestCase(TestCase):
         spot_id = response.data.decode("utf-8").strip().strip("\"")
         print("Test Bad Review (Make Spot First)", spot_id)
         self.assertEqual(response.status_code, 200)
+        self.delete_ids["spot"].append(spot_id)
         
         self.reviewData["spotID"] = spot_id
         response = self.client.post("/spot_review/create", data=self.reviewData, headers=self.headers)
@@ -202,6 +211,7 @@ class EndpointTestCase(TestCase):
         print("Test Bad Review (Make Review First)", review_id)
         print(response.data)
         self.assertEqual(response.status_code, 200)
+        self.delete_ids["review"].append(review_id)
         
         response = self.client.put(f"/spot_review/update/{review_id}", data=self.reviewData, headers=self.bad_headers)
         print("Test Update Wrong User", response.data)
@@ -210,11 +220,3 @@ class EndpointTestCase(TestCase):
         response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.bad_headers)
         print("Test Delete Wrong User", response.data)
         self.assertEqual(response.status_code, 403)
-        
-        response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.headers)
-        print("Test Delete Wrong User", response.data)
-        self.assertEqual(response.status_code, 200)
-        
-        response = self.client.delete(f"/spots/delete/{spot_id}", headers=self.headers)
-        print("Test Delete Spot", response.data)
-        self.assertEqual(response.status_code, 200)

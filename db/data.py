@@ -1,6 +1,7 @@
 # from hashlib import new
 import os
 import db.db_connect as dbc
+from db.models import SPOT_FACTORS
 from dotenv import load_dotenv
 from datetime import datetime
 
@@ -21,9 +22,6 @@ DUPLICATE = 2
 
 client = dbc.get_client()
 print(client)
-
-FACTORS = ["factorAvailability", "factorNoiseLevel",
-           "factorTemperature", "factorAmbiance"]
 
 
 def get_spots():
@@ -104,14 +102,12 @@ def update_spot_factors(spot_id, factor_update):
         print("Resetting factors with today's data: %s", today)
         new_spot_doc["numFactorEntries"] = 0
         new_spot_doc["factorDate"] = today
-        new_spot_doc["factorAvailability"] = 0
-        new_spot_doc["factorNoiseLevel"] = 0
-        new_spot_doc["factorTemperature"] = 0
-        new_spot_doc["factorAmbiance"] = 0
+        for f_field in SPOT_FACTORS:
+            new_spot_doc[f_field] = 0
 
     N = new_spot_doc["numFactorEntries"]
     new_spot_doc["numFactorEntries"] += 1
-    for f_field in FACTORS:
+    for f_field in SPOT_FACTORS:
         old_avg = new_spot_doc[f_field]
         new_value = factor_update[f_field]
         if new_value < 1:
