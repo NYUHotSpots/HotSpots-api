@@ -47,10 +47,10 @@ reviewParser.add_argument('reviewRating', type=int, location='form')
 
 # each will be a number from 1 to 10
 factorParser = reqparse.RequestParser()
-factorParser.add_argument('factorAvailability', type=str, location='form')
-factorParser.add_argument('factorNoiseLevel', type=str, location='form')
-factorParser.add_argument('factorTemperature', type=str, location='form')
-factorParser.add_argument('factorAmbiance', type=str, location='form')
+factorParser.add_argument('factorAvailability', type=int, location='form')
+factorParser.add_argument('factorNoiseLevel', type=int, location='form')
+factorParser.add_argument('factorTemperature', type=int, location='form')
+factorParser.add_argument('factorAmbiance', type=int, location='form')
 
 
 @api.route('/hello')

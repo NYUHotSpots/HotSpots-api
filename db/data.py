@@ -22,6 +22,9 @@ DUPLICATE = 2
 client = dbc.get_client()
 print(client)
 
+FACTORS = ["factorAvailability", "factorNoiseLevel",
+           "factorTemperature", "factorAmbiance"]
+
 
 def get_spots():
     """
@@ -34,36 +37,23 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage):
     """
     create a new spot document
     """
+    today = datetime.today().date().strftime('%Y-%m-%d')
+    now = str(datetime.now())
     print("Creating new spot document")
-    print("Today is", datetime.today().date().strftime('%Y-%m-%d'))
+    print("Today is", today)
     spot_document = {
         "spotName": spotName,
         "spotImage": spotImage,
         "spotAddress": spotAddress,
         "spotCapacity": spotCapacity,
-        "spotCreation": str(datetime.now()),
-        "spotUpdate": str(datetime.now()),
-        "factorAvailability": {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": 0,
-            "factorNumOfInputs": 0
-        },
-        "factorNoiseLevel": {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": 0,
-            "factorNumOfInputs": 0
-        },
-        "factorTemperature": {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": 0,
-            "factorNumOfInputs": 0
-        },
-        "factorAmbiance": {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": 0,
-            "factorNumOfInputs": 0
-        },
-        "reviews": []
+        "spotCreation": now,
+        "spotUpdate": now,
+        "factorAvailability": 0,
+        "factorNoiseLevel": 0,
+        "factorTemperature": 0,
+        "factorAmbiance": 0,
+        "numFactorEntries": 0,
+        "factorDate": today
     }
 
     response = dbc.create_spot(spot_document)
@@ -97,50 +87,37 @@ def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
     return response
 
 
-def update_individual_spot_factor(spot_id, factorName, factorRating):
-    if not (1 <= factorRating <= 10):
-        return
-    spotFactor = dbc.get_spot_factor(spot_id, factorName)
-    today = datetime.today().date()
-
-    spot_document = {}
-    spot_document["spotUpdate"] = str(datetime.now())
-
-    # if dates are not the same, then new day has begun
-    # need to reset data with current input
-    if datetime.strptime(spotFactor["factorDate"], '%Y-%m-%d').date() != today:
-        print("Resetting factors with today's data: %s", today)
-        spot_document[factorName] = {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": factorRating,
-            "factorNumOfInputs": 1
-        }
-        dbc.update_spot_factor(spot_id, spot_document)
-    # if day is still going on, need to average out new input
-    else:
-        print("Correct date")
-        currentRating = spotFactor["factorValue"]
-        currentCount = spotFactor["factorNumOfInputs"]
-        newCount = currentCount + 1
-        newRatingAverage = ((currentRating*currentCount)+factorRating)/newCount
-        spot_document[factorName] = {
-            "factorDate": datetime.today().date().strftime('%Y-%m-%d'),
-            "factorValue": newRatingAverage,
-            "factorNumOfInputs": newCount
-        }
-        dbc.update_spot_factor(spot_id, spot_document)
-
-
-def update_spot_factors(spot_id, factorArgs):
+def update_spot_factors(spot_id, factor_update):
     spot_id = dbc.convert_to_object_id(spot_id)
-    if not dbc.check_document_exist("_id", spot_id, "spots"):
+    spot_document = dbc.check_document_exist("_id", spot_id, "spots")
+    if not spot_document:
         return NOT_FOUND
-    for factor in factorArgs:
-        print(factor, factorArgs[factor])
-        rating = int(factorArgs[factor])
-        update_individual_spot_factor(spot_id, factor, rating)
+    # we won't have more than one bc we look by id
+    new_spot_doc = spot_document[0]
+    today = datetime.today().date()
+    date = datetime.strptime(new_spot_doc["factorDate"], '%Y-%m-%d').date()
+    if date != today:
+        # reset everything to 0, doesn't matter for the average
+        print("Resetting factors with today's data: %s", today)
+        new_spot_doc["numFactorEntries"] = 0
+        new_spot_doc["factorDate"] = today
+        new_spot_doc["factorAvailability"] = 0
+        new_spot_doc["factorNoiseLevel"] = 0
+        new_spot_doc["factorTemperature"] = 0
+        new_spot_doc["factorAmbiance"] = 0
 
+    new_spot_doc["numFactorEntries"] += 1
+    N = new_spot_doc["numFactorEntries"]
+    for f_field in FACTORS:
+        old_avg = new_spot_doc[f_field]
+        new_spot_doc[f_field] = get_average(old_avg, N, factor_update[f_field])
+
+    dbc.update_spot_factor(spot_id, new_spot_doc)
     return spot_id
+
+
+def get_average(old_average, n, new_value):
+    return ((old_average * n-1) + new_value)/n
 
 
 def delete_spot(spot_id):
