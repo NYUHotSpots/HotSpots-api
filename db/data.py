@@ -74,6 +74,9 @@ def get_spot_detail(spot_id):
 
 
 def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
+    """
+    Update spot attribute
+    """
     spot_document = {
         "spotName": spotName,
         "spotImage": spotImage,
