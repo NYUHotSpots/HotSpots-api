@@ -84,6 +84,9 @@ def get_spot_detail(spot_id):
 
 
 def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
+    """
+    Update spot attribute
+    """
     spot_document = {
         "spotName": spotName,
         "spotImage": spotImage,
@@ -96,8 +99,11 @@ def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage):
         return NOT_FOUND
     return response
 
-
+# Deprecated
 def update_individual_spot_factor(spot_id, factorName, factorRating):
+    """
+    checks new date to reset data or create new average
+    """
     if not (1 <= factorRating <= 10):
         return
     spotFactor = dbc.get_spot_factor(spot_id, factorName)
