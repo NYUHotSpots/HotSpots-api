@@ -34,7 +34,7 @@ factors_ns = api.namespace("spot_factors",
                            description="adjust factors for spot")
 review_ns = api.namespace("spot_review", description="adjust review for spot")
 spot_factor_types_ns = api.namespace(
-    "spot_factor_types", description="adjust review for spot") # hateoas namespace
+    "spot_factor_types", description="adjust review for spot")  # hateoas
 
 
 @api.route('/hello')
