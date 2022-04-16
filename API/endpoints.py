@@ -77,7 +77,7 @@ class SpotCreate(Resource):
         """
         args = spotParser.parse_args()
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
-                                    args['spotCapacity'], args['spotImage'])
+                                    args['spotCapacity'], args['spotImage'], args['spotImageUpload'])
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
@@ -257,3 +257,10 @@ class ReviewUpdate(Resource):
             raise (wz.NotFound(f"Spot {review_id} not found."))
         else:
             return f"{review_response} factor updated."
+
+
+@api.route('/file/<file_id>')
+class File(Resource):
+    def get(self, file_id):
+        response = db.get_file(file_id)
+        return response

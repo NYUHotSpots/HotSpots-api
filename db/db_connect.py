@@ -6,6 +6,8 @@ import json
 import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
+import gridfs
+import codecs
 from bson.errors import InvalidId
 from dotenv import load_dotenv
 from datetime import datetime
@@ -261,3 +263,29 @@ def update_spot_factor(spot_id, updateFactorDocument):
     filter = {"_id": convert_to_object_id(spot_id)}
     new_values = {"$set": updateFactorDocument}
     return client[DB_NAME]['spots'].update_one(filter, new_values)
+
+
+def save_file(name, file):
+    gfs = gridfs.GridFS(client[DB_NAME])
+    id = gfs.put(file, filename=name)
+    query = {
+        "_id": id, 
+        "name": name
+    }
+    client[DB_NAME]['spotImages'].insert_one(query)
+    print(f"spot image {id=}")
+    return id
+
+def fetch_file(id):
+    try:
+        id = convert_to_object_id(id)
+        item = client[DB_NAME]['spotImages'].find_one({"_id": id})
+        print(f"{item=}")
+        gfs = gridfs.GridFS(client[DB_NAME])
+        image = gfs.get(item['_id'])
+        base64_data = codecs.encode(image.read(), 'base64')
+        image = base64_data.decode('utf-8')
+        return image
+    except (pm.errors.CursorNotFound, InvalidId):
+        LOG.error("trouble fetching file")
+        return
