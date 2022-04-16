@@ -133,7 +133,7 @@ def delete_spot(spot_id):
         return NOT_FOUND
     reviews = dbc.get_review_by_spot(spot_id)
     if reviews:
-        for review in reviews: 
+        for review in reviews:
             delete_review(review["_id"]["$oid"], None, True)
     return response
 
