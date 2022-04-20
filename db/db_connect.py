@@ -8,6 +8,7 @@ import pymongo as pm
 import bson.json_util as bsutil
 import gridfs
 import codecs
+from io import BytesIO
 from bson.errors import InvalidId
 from dotenv import load_dotenv
 from datetime import datetime
@@ -277,15 +278,16 @@ def save_file(name, file):
     return id
 
 def fetch_file(id):
+    # open_download_stream_by_name
     try:
         id = convert_to_object_id(id)
         item = client[DB_NAME]['spotImages'].find_one({"_id": id})
         print(f"{item=}")
-        gfs = gridfs.GridFS(client[DB_NAME])
-        image = gfs.get(item['_id'])
-        base64_data = codecs.encode(image.read(), 'base64')
-        image = base64_data.decode('utf-8')
-        return image
+        gfs = gridfs.GridFSBucket(client[DB_NAME])
+        grid_out = gfs.open_download_stream(id)
+        image = grid_out.read()
+        filename = client[DB_NAME]['fs.files'].find_one({"_id": id})
+        return (BytesIO(image), filename["filename"])
     except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("trouble fetching file")
         return

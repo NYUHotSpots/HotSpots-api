@@ -140,6 +140,10 @@ def delete_spot(spot_id):
     response = dbc.delete_spot(spot_id)
     if response is None:
         return NOT_FOUND
+    reviews = dbc.get_review_by_spot(spot_id)
+    if reviews:
+        for review in reviews:
+            delete_review(review["_id"]["$oid"], None, True)
     return response
 
 

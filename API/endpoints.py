@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask, g
+from flask import Flask, g, helpers, send_file
 from flask_cors import CORS
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
@@ -33,6 +33,8 @@ spots_ns = api.namespace("spots", description="adjust spots")
 factors_ns = api.namespace("spot_factors",
                            description="adjust factors for spot")
 review_ns = api.namespace("spot_review", description="adjust review for spot")
+spot_factor_types_ns = api.namespace(
+    "spot_factor_types", description="adjust review for spot")  # hateoas
 
 
 @api.route('/hello')
@@ -41,6 +43,7 @@ class HelloWorld(Resource):
     The purpose of the HelloWorld class is to have a simple test to see if the
     app is working at all.
     """
+
     def get(self):
         """
         A trivial endpoint to see if the server is running.
@@ -151,7 +154,7 @@ class SpotDelete(Resource):
 @factors_ns.route('/update/<spot_id>')
 class SpotUpdateFactor(Resource):
     """
-    This endpoint updates a spot
+    This endpoint updates spot factors
     """
     @api.response(HTTPStatus.OK, 'Success')
     @api.response(HTTPStatus.NOT_FOUND, 'Not Found')
@@ -263,4 +266,60 @@ class ReviewUpdate(Resource):
 class File(Resource):
     def get(self, file_id):
         response = db.get_file(file_id)
-        return response
+        print(response)
+        return send_file(response[0], attachment_filename=response[1])
+
+
+@spot_factor_types_ns.route('/get')
+class HATEOASSpotFactors(Resource):
+    """
+    This endpoint returns a pick list of spot factors
+    """
+    @api.response(HTTPStatus.OK, 'Success')
+    def get(self):
+        """
+        Return Spot factors
+        """
+        factors = {
+            "availability": {
+                "display_name": "Availability",
+                "pick_list": [
+                    ("At capacity (No seats)", 1),
+                    ("Crowded (limited seating)", 2),
+                    ("Not too crowded (Some seats available)", 3),
+                    ("Many seats", 4),
+                    ("Too many seats free", 5)
+                ]
+            },
+            "noise": {
+                "display_name": "Noise Level",
+                "pick_list": [
+                    ("Quiet (silent / near silent)", 1),
+                    ("Some noise (whispering to normal speech)", 2),
+                    ("Noisy (very loud)", 3),
+                    ("Unbearably loud", 4),
+                    ("Ruptured eardrum", 5)
+                ]
+            },
+            "temp": {
+                "display_name": "Temperature",
+                "pick_list": [
+                    ("Cold / Chilly", 1),
+                    ("Comfortable", 2),
+                    ("Warm / Hot", 3),
+                    ("Flaming", 4),
+                    ("Burning", 5)
+                ]
+            },
+            "ambi": {
+                "display_name": "Ambiance",
+                "pick_list": [
+                    ("Chill", 1),
+                    ("Regular", 2),
+                    ("Neutral", 3),
+                    ("Busy", 4),
+                    ("Serious/Business", 5)
+                ]
+            }
+        }
+        return factors
