@@ -41,7 +41,7 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage, spotImageUpload):
         filename = spotImageUpload.filename
         id = str(dbc.save_file(filename, spotImageUpload))
         spotImage = f"{URLNAME}/file/{id}"
-    
+
     today = datetime.today().date().strftime('%Y-%m-%d')
     now = str(datetime.now())
     print("Creating new spot document")
@@ -78,7 +78,8 @@ def get_spot_detail(spot_id):
     return response
 
 
-def update_spot(spot_id, spotName, spotAddress, spotCapacity, spotImage, spotImageUpload):
+def update_spot(spot_id, spotName, spotAddress, spotCapacity,
+                spotImage, spotImageUpload):
     """
     Update spot attribute
     """
@@ -204,6 +205,7 @@ def update_review(review_id, spot_id, reviewTitle,
         return NOT_FOUND
     return response
 
+
 def get_file(file_id):
-    file =  dbc.fetch_file(file_id)
+    file = dbc.fetch_file(file_id)
     return file if file is not None else NOT_FOUND

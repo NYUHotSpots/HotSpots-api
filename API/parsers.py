@@ -4,7 +4,9 @@ import werkzeug
 spotParser = reqparse.RequestParser()
 spotParser.add_argument('spotName', type=str, location='form')
 spotParser.add_argument('spotImage', type=str, location='form')
-spotParser.add_argument('spotImageUpload', type=werkzeug.datastructures.FileStorage, location='files')
+spotParser.add_argument('spotImageUpload',
+                        type=werkzeug.datastructures.FileStorage,
+                        location='files')
 spotParser.add_argument('spotAddress', type=str, location='form')
 spotParser.add_argument('spotCapacity', type=str, location='form')
 

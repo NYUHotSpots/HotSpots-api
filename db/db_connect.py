@@ -137,12 +137,11 @@ def update_spot(spot_id, spot_document):
     LOG.info("Attempting spot update")
     try:
         spot_id = convert_to_object_id(spot_id)
-        spot = check_document_exist("_id", spot_id, "spots")[0]
+        spot = check_document_exist("_id", spot_id, "spots")
         if not spot:
             return None
-        else: 
-            print(f"{spot=}")
-            if URLNAME in spot["spotImage"]:
+        else:
+            if URLNAME in spot[0]["spotImage"]:
                 # delete the old image and save new one
                 old_image_id = spot["spotImage"].split("/")[-1]
                 delete_file(old_image_id)
@@ -278,7 +277,7 @@ def save_file(name, file):
 
 
 def delete_file(id):
-    try: 
+    try:
         id = convert_to_object_id(id)
         client[DB_NAME]['fs.files'].delete_one({"_id": id})
         client[DB_NAME]['fs.chunks'].delete_one({"files_id": id})
