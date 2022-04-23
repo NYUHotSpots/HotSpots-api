@@ -12,5 +12,3 @@ pyjwt[crypto]
 flask_talisman
 Flask-Cors
 requests
-gridfs
-codecs
