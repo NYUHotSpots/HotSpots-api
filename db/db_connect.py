@@ -164,7 +164,7 @@ def delete_spot(spot_id):
         if not spot:
             return None
         else:
-            delete_spot_image(spot)            
+            delete_spot_image(spot)
         filter = {"_id": convert_to_object_id(spot_id)}
         spot_deletion = client[DB_NAME]['spots'].delete_one(filter)
         LOG.info("Successfully deleted spot " + str(spot_id))
