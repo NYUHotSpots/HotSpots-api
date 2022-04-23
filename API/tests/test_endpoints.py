@@ -19,6 +19,7 @@ class EndpointTestCase(TestCase):
         self.spotData = {
             "spotName": "TEST SPOT",
             "spotAddress": "6 MetroTech Center, Brooklyn, NY 11201",
+            "spotImage": "Nothing",
             "spotCapacity": "Medium"
         }
         self.updatedSpotData = self.spotData

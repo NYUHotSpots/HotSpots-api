@@ -6,6 +6,8 @@ import json
 import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
+import gridfs
+from io import BytesIO
 from bson.errors import InvalidId
 from dotenv import load_dotenv
 from datetime import datetime
@@ -25,8 +27,10 @@ db_params = "retryWrites=true&w=majority"
 TEST_MODE = os.environ.get("TEST_MODE")
 if TEST_MODE == "0":
     DB_NAME = os.environ.get("MONGO_DEV")
+    URLNAME = "http://127.0.0.1:8000"
 else:
     DB_NAME = os.environ.get("MONGO_PROD")
+    URLNAME = "https://hotspotsapi.herokuapp.com"
 print("Using DB:", DB_NAME)
 
 
@@ -133,18 +137,18 @@ def update_spot(spot_id, spot_document):
     LOG.info("Attempting spot update")
     try:
         spot_id = convert_to_object_id(spot_id)
-        if not check_document_exist("_id", spot_id, "spots"):
+        spot = check_document_exist("_id", spot_id, "spots")
+        if not spot:
             return None
+        else:
+            delete_spot_image(spot)
         filter = {"_id": spot_id}
         new_values = {"$set": spot_document}
         spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
         LOG.info("Successfully updated spot" + str(spot_id))
         print(spot_update)
         return spot_update
-    except pm.errors.KeyNotFound:
-        LOG.error("Flavor does not exist in DB")
-        return None
-    except pm.errors.UpdateOperationFailed:
+    except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Error occurred while updating DB, try again later")
         return None
 
@@ -156,8 +160,11 @@ def delete_spot(spot_id):
     LOG.info("Attempting spot deletion")
     try:
         spot_id = convert_to_object_id(spot_id)
-        if not (check_document_exist("_id", spot_id, "spots")):
+        spot = check_document_exist("_id", spot_id, "spots")
+        if not spot:
             return None
+        else:
+            delete_spot_image(spot)
         filter = {"_id": convert_to_object_id(spot_id)}
         spot_deletion = client[DB_NAME]['spots'].delete_one(filter)
         LOG.info("Successfully deleted spot " + str(spot_id))
@@ -165,6 +172,14 @@ def delete_spot(spot_id):
     except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Spot does not exist in DB")
         return None
+
+
+def delete_spot_image(spot):
+    image = spot[0]["spotImage"]
+    if image and URLNAME in image:
+        # delete the old image and save new one
+        old_image_id = image.split("/")[-1]
+        delete_file(old_image_id)
 
 
 def create_review(spotID, review_object):
@@ -261,3 +276,33 @@ def update_spot_factor(spot_id, updateFactorDocument):
     filter = {"_id": convert_to_object_id(spot_id)}
     new_values = {"$set": updateFactorDocument}
     return client[DB_NAME]['spots'].update_one(filter, new_values)
+
+
+def save_file(name, file):
+    gfs = gridfs.GridFS(client[DB_NAME])
+    id = gfs.put(file, filename=name)
+    return id
+
+
+def delete_file(id):
+    try:
+        id = convert_to_object_id(id)
+        client[DB_NAME]['fs.files'].delete_one({"_id": id})
+        client[DB_NAME]['fs.chunks'].delete_one({"files_id": id})
+    except (pm.errors.CursorNotFound, InvalidId):
+        LOG.error("Error occurred with deleting file {id}")
+        return None
+
+
+def fetch_file(id):
+    # open_download_stream_by_name
+    try:
+        id = convert_to_object_id(id)
+        gfs = gridfs.GridFSBucket(client[DB_NAME])
+        grid_out = gfs.open_download_stream(id)
+        image = grid_out.read()
+        filename = client[DB_NAME]['fs.files'].find_one({"_id": id})
+        return (BytesIO(image), filename["filename"])
+    except (pm.errors.CursorNotFound, InvalidId, gridfs.errors.NoFile):
+        LOG.error("trouble fetching file")
+        return

@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask, g
+from flask import Flask, g, send_file
 from flask_cors import CORS
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
@@ -80,7 +80,8 @@ class SpotCreate(Resource):
         """
         args = spotParser.parse_args()
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
-                                    args['spotCapacity'], args['spotImage'])
+                                    args['spotCapacity'], args['spotImage'],
+                                    args['spotImageUpload'])
         if spot_response == db.DUPLICATE:
             raise (wz.NotAcceptable("Spot already exists."))
         else:
@@ -123,7 +124,8 @@ class SpotUpdate(Resource):
         spot_response = db.update_spot(spot_id, args['spotName'],
                                        args['spotAddress'],
                                        args['spotCapacity'],
-                                       args['spotImage'])
+                                       args['spotImage'],
+                                       args['spotImageUpload'])
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
@@ -260,6 +262,16 @@ class ReviewUpdate(Resource):
             raise (wz.NotFound(f"Spot {review_id} not found."))
         else:
             return f"{review_response} factor updated."
+
+
+@api.route('/file/<file_id>')
+class File(Resource):
+    def get(self, file_id):
+        response = db.get_file(file_id)
+        print(response)
+        if response == db.NOT_FOUND:
+            raise (wz.NotFound(f"File {file_id} not found."))
+        return send_file(response[0], attachment_filename=response[1])
 
 
 @spot_factor_types_ns.route('/get')
