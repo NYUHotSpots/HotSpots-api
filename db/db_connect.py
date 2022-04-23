@@ -141,10 +141,7 @@ def update_spot(spot_id, spot_document):
         if not spot:
             return None
         else:
-            if URLNAME in spot[0]["spotImage"]:
-                # delete the old image and save new one
-                old_image_id = spot["spotImage"].split("/")[-1]
-                delete_file(old_image_id)
+            delete_spot_image(spot)
         filter = {"_id": spot_id}
         new_values = {"$set": spot_document}
         spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
@@ -163,8 +160,11 @@ def delete_spot(spot_id):
     LOG.info("Attempting spot deletion")
     try:
         spot_id = convert_to_object_id(spot_id)
-        if not (check_document_exist("_id", spot_id, "spots")):
+        spot = check_document_exist("_id", spot_id, "spots")
+        if not spot:
             return None
+        else:
+            delete_spot_image(spot)            
         filter = {"_id": convert_to_object_id(spot_id)}
         spot_deletion = client[DB_NAME]['spots'].delete_one(filter)
         LOG.info("Successfully deleted spot " + str(spot_id))
@@ -172,6 +172,14 @@ def delete_spot(spot_id):
     except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Spot does not exist in DB")
         return None
+
+
+def delete_spot_image(spot):
+    image = spot[0]["spotImage"]
+    if image and URLNAME in image:
+        # delete the old image and save new one
+        old_image_id = image.split("/")[-1]
+        delete_file(old_image_id)
 
 
 def create_review(spotID, review_object):
