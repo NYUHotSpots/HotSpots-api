@@ -7,7 +7,6 @@ import logging as LOG
 import pymongo as pm
 import bson.json_util as bsutil
 import gridfs
-import codecs
 from io import BytesIO
 from bson.errors import InvalidId
 from dotenv import load_dotenv
@@ -28,8 +27,10 @@ db_params = "retryWrites=true&w=majority"
 TEST_MODE = os.environ.get("TEST_MODE")
 if TEST_MODE == "0":
     DB_NAME = os.environ.get("MONGO_DEV")
+    URLNAME = "http://127.0.0.1:8000"
 else:
     DB_NAME = os.environ.get("MONGO_PROD")
+    URLNAME = "https://hotspotsapi.herokuapp.com"
 print("Using DB:", DB_NAME)
 
 
@@ -136,18 +137,22 @@ def update_spot(spot_id, spot_document):
     LOG.info("Attempting spot update")
     try:
         spot_id = convert_to_object_id(spot_id)
-        if not check_document_exist("_id", spot_id, "spots"):
+        spot = check_document_exist("_id", spot_id, "spots")[0]
+        if not spot:
             return None
+        else: 
+            print(f"{spot=}")
+            if URLNAME in spot["spotImage"]:
+                # delete the old image and save new one
+                old_image_id = spot["spotImage"].split("/")[-1]
+                delete_file(old_image_id)
         filter = {"_id": spot_id}
         new_values = {"$set": spot_document}
         spot_update = client[DB_NAME]['spots'].update_one(filter, new_values)
         LOG.info("Successfully updated spot" + str(spot_id))
         print(spot_update)
         return spot_update
-    except pm.errors.KeyNotFound:
-        LOG.error("Flavor does not exist in DB")
-        return None
-    except pm.errors.UpdateOperationFailed:
+    except (pm.errors.CursorNotFound, InvalidId):
         LOG.error("Error occurred while updating DB, try again later")
         return None
 
@@ -269,25 +274,28 @@ def update_spot_factor(spot_id, updateFactorDocument):
 def save_file(name, file):
     gfs = gridfs.GridFS(client[DB_NAME])
     id = gfs.put(file, filename=name)
-    query = {
-        "_id": id, 
-        "name": name
-    }
-    client[DB_NAME]['spotImages'].insert_one(query)
-    print(f"spot image {id=}")
     return id
+
+
+def delete_file(id):
+    try: 
+        id = convert_to_object_id(id)
+        client[DB_NAME]['fs.files'].delete_one({"_id": id})
+        client[DB_NAME]['fs.chunks'].delete_one({"files_id": id})
+    except (pm.errors.CursorNotFound, InvalidId):
+        LOG.error("Error occurred with deleting file {id}")
+        return None
+
 
 def fetch_file(id):
     # open_download_stream_by_name
     try:
         id = convert_to_object_id(id)
-        item = client[DB_NAME]['spotImages'].find_one({"_id": id})
-        print(f"{item=}")
         gfs = gridfs.GridFSBucket(client[DB_NAME])
         grid_out = gfs.open_download_stream(id)
         image = grid_out.read()
         filename = client[DB_NAME]['fs.files'].find_one({"_id": id})
         return (BytesIO(image), filename["filename"])
-    except (pm.errors.CursorNotFound, InvalidId):
+    except (pm.errors.CursorNotFound, InvalidId, gridfs.errors.NoFile):
         LOG.error("trouble fetching file")
         return

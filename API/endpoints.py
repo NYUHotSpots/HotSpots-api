@@ -4,7 +4,7 @@ The endpoint called `endpoints` will return all available endpoints.
 """
 
 from http import HTTPStatus
-from flask import Flask, g, helpers, send_file
+from flask import Flask, g, send_file, request
 from flask_cors import CORS
 from flask_restx import Resource, Api
 import werkzeug.exceptions as wz
@@ -123,7 +123,7 @@ class SpotUpdate(Resource):
         spot_response = db.update_spot(spot_id, args['spotName'],
                                        args['spotAddress'],
                                        args['spotCapacity'],
-                                       args['spotImage'])
+                                       args['spotImage'], args['spotImageUpload'])
         if spot_response == db.NOT_FOUND:
             raise (wz.NotFound(f"Spot {spot_id} not found."))
         else:
@@ -267,6 +267,8 @@ class File(Resource):
     def get(self, file_id):
         response = db.get_file(file_id)
         print(response)
+        if response == db.NOT_FOUND: 
+            raise (wz.NotFound(f"File {file_id} not found.")) 
         return send_file(response[0], attachment_filename=response[1])
 
 
