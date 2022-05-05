@@ -5,6 +5,7 @@ This file holds the tests for endpoints.py.
 from unittest import TestCase
 import API.endpoints as ep
 import json
+from io import BytesIO
 from API.security.utils import get_auth0_token, get_access_token_for_test_user
 
 userToken = "Bearer " + get_access_token_for_test_user() # this gives a token for the test user johndoe1 who has the admin role
@@ -221,3 +222,40 @@ class EndpointTestCase(TestCase):
         response = self.client.delete(f"/spot_review/delete/{review_id}", headers=self.bad_headers)
         print("Test Delete Wrong User", response.data)
         self.assertEqual(response.status_code, 403)
+
+    def test_image_crud(self):
+        self.spotData['spotImageUpload'] = (BytesIO(b"abcdef"), 'test.jpg')
+        self.headers["content_type"] = 'multipart/form-data'
+        response = self.client.post("/spots/create", data=self.spotData, headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        spot_id = response.data.decode("utf-8").strip().strip("\"")
+        
+        response = self.client.get(f"/spots/{spot_id}", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        spotImage = json.loads(response.data.decode("utf-8"))["spotImage"]
+        print(f"{spotImage=}")
+        
+        response = self.client.get(spotImage)
+        self.assertEqual(response.status_code, 200)
+        print(response)
+        
+        self.spotData['spotImageUpload'] = (BytesIO(b"abcdefg"), 'test1.jpg')
+        response = self.client.put(f"/spots/update/{spot_id}", data=self.spotData, headers=self.headers)
+        print("Test Update Spot", response.data)
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.get(f"/spots/{spot_id}", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        spotImage2 = json.loads(response.data.decode("utf-8"))["spotImage"]
+        self.assertNotEqual(spotImage, spotImage2)
+        
+        response = self.client.get(spotImage)
+        self.assertEqual(response.status_code, 404)
+        print(response)
+        
+        response = self.client.delete(f"/spots/delete/{spot_id}", headers=self.headers)
+        self.assertEqual(response.status_code, 200)
+        
+        response = self.client.get(spotImage2)
+        self.assertEqual(response.status_code, 404)
+        print(response)

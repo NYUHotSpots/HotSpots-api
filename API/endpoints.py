@@ -79,6 +79,7 @@ class SpotCreate(Resource):
         Creates a new spot
         """
         args = spotParser.parse_args()
+        print(args)
         spot_response = db.add_spot(args['spotName'], args['spotAddress'],
                                     args['spotCapacity'], args['spotImage'],
                                     args['spotImageUpload'])
