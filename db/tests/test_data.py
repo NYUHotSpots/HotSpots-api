@@ -4,11 +4,9 @@ This file holds the tests for db.py.
 
 from unittest import TestCase, skip
 import db.data as db
-from db.db_connect import check_user_id_on_review, create_review, create_spot, fetch_spot_details
 import db_connect as dbc
 from io import BytesIO
 from pymongo.results import UpdateResult, DeleteResult
-from werkzeug.exceptions import Forbidden
 import bson.json_util as bsutil
 
 # SPOT TEST DATA
@@ -113,7 +111,7 @@ class DBTestCase(TestCase):
             "factorAmbiance": 0
         }
         testUpdateFactors = db.update_spot_factors(self.spot_id, updatedFactors)
-        self.assertIsInstance(testUpdateFactors, bsutil.ObjectId)
+        self.assertEqual(str(testUpdateFactors), self.spot_id)
     
     def test_get_avergage(self):
         avg = db.get_average(0, 1, 5)
