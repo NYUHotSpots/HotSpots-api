@@ -43,7 +43,7 @@ def add_spot(spotName, spotAddress, spotCapacity, spotImage, spotImageUpload):
         spotImage = f"{URLNAME}/file/{id}"
 
     today = datetime.today().date().strftime('%Y-%m-%d')
-    now = str(datetime.now())
+    now = str(datetime.now().strftime('%Y-%m-%d'))
     print("Creating new spot document")
     print("Today is", today)
     spot_document = {
