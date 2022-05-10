@@ -103,16 +103,6 @@ class DBTestCase(TestCase):
         testGetSpotDetail = db.get_spot_detail(self.spot_id)
         self.assertIsInstance(testGetSpotDetail, dict)
     
-    def test_update_factors(self):
-        updatedFactors = {
-            "factorAvailability": 0,
-            "factorNoiseLevel": 0,
-            "factorTemperature": 0,
-            "factorAmbiance": 0
-        }
-        testUpdateFactors = db.update_spot_factors(self.spot_id, updatedFactors)
-        self.assertEqual(str(testUpdateFactors), self.spot_id)
-    
     def test_get_avergage(self):
         avg = db.get_average(0, 1, 5)
         self.assertEqual(avg, 2.5)
