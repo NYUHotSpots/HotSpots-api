@@ -175,6 +175,8 @@ def delete_spot(spot_id):
 
 
 def delete_spot_image(spot):
+    if not spot[0].get("spotImage"):
+        return
     image = spot[0]["spotImage"]
     if image and URLNAME in image:
         # delete the old image and save new one
